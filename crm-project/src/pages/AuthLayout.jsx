@@ -11,12 +11,13 @@ const AuthLayout = ({ title, children }) => {
 
 const styles = {
   container: {
-    minHeight: "100vh",
+    width: "100%",
+    minHeight: "500px",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     background: "linear-gradient(135deg, #667eea, #764ba2)",
-    padding: "20px",
+    padding: "30px",
   },
   card: {
     width: "100%",

@@ -57,9 +57,7 @@ const Login = () => {
           {loading ? "Signing in..." : "Login"}
         </button>
 
-        <p style={styles.footer}>
-          Forgot password? <span style={styles.link}>Reset</span>
-        </p>
+        
       </form>
     </AuthLayout>
   );
