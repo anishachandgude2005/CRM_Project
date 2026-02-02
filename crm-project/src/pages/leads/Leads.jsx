@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+
+
 
 const LEAD_KEY = "crm_leads";
 const EMP_KEY = "crm_employees";
@@ -59,6 +62,18 @@ const Leads = () => {
       status: "New"
     });
   };
+  //View lead
+  const viewLead = (lead) => {
+  alert(
+    `Lead Details\n\n` +
+    `Name: ${lead.name}\n` +
+    `Email: ${lead.email}\n` +
+    `Phone: ${lead.phone}\n` +
+    `Employee: ${lead.assignedTo || "Not Assigned"}\n` +
+    `Status: ${lead.status}`
+  );
+};
+
 
   // Edit Lead
   const editLead = (lead) => {
@@ -103,7 +118,7 @@ const Leads = () => {
       </div>
 
       {/* TABLE */}
-      <table border="1" width="100%" cellPadding="10">
+      <table border="1" width="1200" cellPadding="10">
         <thead>
           <tr>
             <th>Name</th>
@@ -126,8 +141,17 @@ const Leads = () => {
                 <td>{lead.assignedTo || "-"}</td>
                 <td>{lead.status}</td>
                 <td>
-                  <button onClick={() => editLead(lead)}>Edit</button>
-                  <button onClick={() => deleteLead(lead.id)}>Delete</button>
+                  <button style={styles.viewBtn} onClick={() => viewLead(lead)}>
+                  <FaEye /> View
+                 </button>
+                  <button style={styles.editBtn} onClick={() => editLead(lead)}>
+                 <FaEdit /> Edit
+                  </button>
+
+                 <button style={styles.deleteBtn} onClick={() => deleteLead(lead.id)}>
+                 <FaTrash /> Delete
+                  </button>
+
                 </td>
               </tr>
             ))
