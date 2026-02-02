@@ -3,6 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+import Login from "./pages/Login";
 import MainLayout from "./layouts/MainLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 
@@ -17,10 +18,11 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+      {/* Login Page */}
+      <Route path="/login" element={<Login />} />
 
         {/* Main Layout */}
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Navigate to="/dashboard" />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leads" element={<Leads />} />
@@ -29,6 +31,10 @@ function App() {
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
+        
+        {/* Default */}
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/login" />} />
 
       </Routes>
     </BrowserRouter>
