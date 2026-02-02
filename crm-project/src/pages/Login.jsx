@@ -1,109 +1,105 @@
 import { useState } from "react";
 import AuthLayout from "./AuthLayout";
+import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState("Admin");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const navigate= useNavigate();
+
+  const handleLogin = () => {
     setError("");
 
-    if (!email || !password) {
-      setError("All fields are required");
+    // Validation
+    if (!email) {
+      setError("Email is required");
       return;
     }
 
-    setLoading(true);
-
-    try {
-      // Simulated API call
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-
-      console.log("Login Success:", { email, password });
-
-      alert("Login Successful!");
-    } catch {
-      setError("Invalid credentials");
-    } finally {
-      setLoading(false);
+    if (!password) {
+      setError("Password is required");
+      return;
     }
+
+    if (password.length < 4) {
+      setError("Password must be at least 4 characters");
+      return;
+    }
+
+    // Mock login success
+    const user = { email, role };
+    localStorage.setItem("crmUser", JSON.stringify(user));
+
+    window.location.href = "/";
   };
 
   return (
-    <AuthLayout title="Sign In to CRM">
-      <form onSubmit={handleSubmit} style={styles.form}>
-        {error && <p style={styles.error}>{error}</p>}
+    <AuthLayout>
+      <h2 style={styles.title}>CRM Login</h2>
 
-        <input
-          type="email"
-          placeholder="Email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={styles.input}
-        />
+      {error && <p style={styles.error}>{error}</p>}
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={styles.input}
-        />
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        style={styles.input}
+      />
 
-        <button type="submit" disabled={loading} style={styles.button}>
-          {loading ? "Signing in..." : "Login"}
-        </button>
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        style={styles.input}
+      />
 
-        <p style={styles.footer}>
-          Forgot password? <span style={styles.link}>Reset</span>
-        </p>
-      </form>
+      <select
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+        style={styles.input}
+      >
+        <option>Admin</option>
+        <option>Manager</option>
+        <option>Employee</option>
+      </select>
+
+      <button onClick={handleLogin} style={styles.button}>
+        Login
+      </button>
     </AuthLayout>
   );
-};
+}
 
 const styles = {
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "14px",
+  title: {
+    textAlign: "center",
+    marginBottom: "15px",
+  },
+  error: {
+    color: "red",
+    textAlign: "center",
+    marginBottom: "10px",
+    fontSize: "14px",
   },
   input: {
     width: "100%",
     padding: "12px",
+    marginBottom: "12px",
     borderRadius: "8px",
-    border: "1px solid #ddd",
-    outline: "none",
-    fontSize: "14px",
+    border: "1px solid #ccc",
   },
   button: {
+    width: "100%",
     padding: "12px",
-    borderRadius: "8px",
-    border: "none",
     background: "#4f46e5",
     color: "#fff",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "0.2s",
-  },
-  error: {
-    color: "red",
-    fontSize: "13px",
-    textAlign: "center",
-  },
-  footer: {
-    textAlign: "center",
-    fontSize: "13px",
-    marginTop: "8px",
-  },
-  link: {
-    color: "#4f46e5",
-    fontWeight: "600",
+    borderRadius: "8px",
+    fontWeight: "bold",
     cursor: "pointer",
   },
 };
-
-export default Login;
