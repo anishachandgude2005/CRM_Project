@@ -1,22 +1,39 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import MainLayout from "./layouts/MainLayout";
+import Dashboard from "./pages/dashboard/Dashboard";
+
+// Temporary placeholder pages (Phase 1)
+const Leads = () => <h1>Leads Page</h1>;
+const Customers = () => <h1>Customers Page</h1>;
+const Tasks = () => <h1>Tasks Page</h1>;
+const Reports = () => <h1>Reports Page</h1>;
+const Settings = () => <h1>Settings Page</h1>;
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        {/* Auth Routes */}
-        <Route path="/login" element={<Login />} />
 
-        {/* Default Route */}
-        <Route path="*" element={<Login />} />
+        {/* Main Layout */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/leads" element={<Leads />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 
 export default App;
+
