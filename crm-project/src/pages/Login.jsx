@@ -33,7 +33,7 @@ export default function Login() {
     const user = { email, role };
     localStorage.setItem("crmUser", JSON.stringify(user));
 
-    window.location.href = "/";
+    navigate("/dashboard")
   };
 
   return (
