@@ -3,7 +3,9 @@ import { NavLink } from "react-router-dom";
 const Sidebar = () => {
   return (
     <aside style={styles.sidebar}>
-      <h2 style={styles.logo}>CRM</h2>
+      <h2 style={{ marginBottom: "20px", color: "black" }}>
+        CRM
+      </h2>
 
       <NavLink to="/dashboard" style={styles.link}>
         Dashboard
@@ -41,7 +43,9 @@ const styles = {
     background: "#f9fafb"
   },
   logo: {
-    marginBottom: "20px"
+    marginBottom: "20px",
+    color: "#000",
+    fontWeight: "bold"
   },
   link: {
     display: "block",
