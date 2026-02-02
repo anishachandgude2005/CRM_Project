@@ -27,11 +27,12 @@ const styles = {
     borderRadius: "14px",
     boxShadow: "0 15px 40px rgba(0,0,0,0.15)",
   },
-  title: {
+   title: {
+    fontSize: "clamp(22px, 3vw, 30px)",
+    fontWeight: "800",
     textAlign: "center",
-    marginBottom: "22px",
-    fontWeight: "700",
-    fontSize: "22px",
+    color: "#1f2937",
+    marginBottom: "6px",
   },
 };
 

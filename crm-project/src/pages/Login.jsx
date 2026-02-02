@@ -85,7 +85,7 @@ const styles = {
     fontSize: "24px",
     fontWeight: "700",
     marginBottom: "5px",
-    color: "#000"
+    color: "#2d2f36",
   },
   
   error: {
