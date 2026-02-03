@@ -1,0 +1,35 @@
+.main-content {
+    margin-left: 220px; /* same as sidebar width */
+    width: calc(100% - 220px);
+    min-height: 100vh;
+    background-color: #f9fafb;
+    padding: 20px;
+  }
+  
+  .page-content h1 {
+    color: #111827;
+    margin-bottom: 20px;
+  }
+  
+  .cards-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex: 1 1 200px;
+    text-align: center;
+    font-weight: bold;
+    color: #1f2937;
+    transition: transform 0.2s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  

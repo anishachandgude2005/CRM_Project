@@ -1,58 +1,20 @@
 import { NavLink } from "react-router-dom";
+import "./Sidebar.css";
 
-const Sidebar = () => {
+export default function Sidebar() {
   return (
-    <aside style={styles.sidebar}>
-      <h2 style={{ marginBottom: "20px", color: "black" }}>
-        CRM
-      </h2>
+    <aside className="sidebar">
+      <h3 className="logo">CRM System</h3>
 
-      <NavLink to="/dashboard" style={styles.link}>
-        Dashboard
-      </NavLink>
-
-      <NavLink to="/leads" style={styles.link}>
-        Leads
-      </NavLink>
-
-      <NavLink to="/customers" style={styles.link}>
-        Customers
-      </NavLink>
-
-      <NavLink to="/tasks" style={styles.link}>
-        Tasks
-      </NavLink>
-
-      <NavLink to="/reports" style={styles.link}>
-        Reports
-      </NavLink>
-
-      <NavLink to="/settings" style={styles.link}>
-        Settings
-      </NavLink>
+      <nav>
+        <NavLink to="/dashboard" className="nav-link">Dashboard</NavLink>
+        <NavLink to="/leads" className="nav-link">Leads</NavLink>
+        <NavLink to="/customers" className="nav-link">Customers</NavLink>
+        <NavLink to="/employees" className="nav-link">Employees</NavLink>
+        <NavLink to="/tasks" className="nav-link">Tasks</NavLink>
+        <NavLink to="/reports" className="nav-link">Reports</NavLink>
+        <NavLink to="/settings" className="nav-link">Settings</NavLink>
+      </nav>
     </aside>
   );
-};
-
-const styles = {
-  sidebar: {
-    width: "220px",
-    minHeight: "100vh",
-    padding: "20px",
-    borderRight: "1px solid #ddd",
-    background: "#f9fafb"
-  },
-  logo: {
-    marginBottom: "20px",
-    color: "#000",
-    fontWeight: "bold"
-  },
-  link: {
-    display: "block",
-    padding: "10px 0",
-    textDecoration: "none",
-    color: "#333"
-  }
-};
-
-export default Sidebar;
+}

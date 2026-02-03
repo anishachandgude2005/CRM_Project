@@ -11,6 +11,7 @@ import Leads from "./pages/leads/Leads";
 // Temporary placeholder pages (Phase 1)
 
 const Customers = () => <h1>Customers Page</h1>;
+const Employees = () => <h1>Employees Page</h1>;
 const Tasks = () => <h1>Tasks Page</h1>;
 const Reports = () => <h1>Reports Page</h1>;
 const Settings = () => <h1>Settings Page</h1>;
@@ -28,6 +29,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/Leads" element={<Leads />} />
           <Route path="/customers" element={<Customers />} />
+          <Route path="/employees" element={<Employees />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
