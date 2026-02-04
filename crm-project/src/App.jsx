@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import MainLayout from "./layouts/MainLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Leads from "./pages/leads/Leads";
+import Profile from "./pages/profile/Profile";
 
 // Temporary placeholder pages (Phase 1)
 
@@ -33,6 +34,7 @@ function App() {
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
         
         {/* Default */}
