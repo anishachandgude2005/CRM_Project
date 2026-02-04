@@ -1,6 +1,11 @@
 export default function Dashboard() {
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
   return (
     <div className="container-fluid">
+
+
       <h2 className="mb-4">Dashboard Overview</h2>
 
       <div className="row">

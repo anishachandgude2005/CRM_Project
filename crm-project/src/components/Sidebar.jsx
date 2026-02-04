@@ -14,6 +14,7 @@ export default function Sidebar() {
         <NavLink to="/tasks" className="nav-link">Tasks</NavLink>
         <NavLink to="/reports" className="nav-link">Reports</NavLink>
         <NavLink to="/settings" className="nav-link">Settings</NavLink>
+        <NavLink to="/profile">My Profile</NavLink>
       </nav>
     </aside>
   );
