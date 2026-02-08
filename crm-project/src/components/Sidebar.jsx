@@ -45,9 +45,11 @@ export default function Sidebar() {
           </NavLink>
         )}
 
+        {(user?.role === "Admin" || user?.role === "Manager") && (
         <NavLink to="/settings" className="nav-link">
           Settings
         </NavLink>
+        )}
 
         <NavLink to="/profile" className="nav-link">
           My Profile
