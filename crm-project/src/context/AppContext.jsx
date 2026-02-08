@@ -1,0 +1,46 @@
+import React, { createContext, useReducer } from "react";
+
+import { users } from "../data/users";
+import { leads } from "../data/leads";
+import { customers } from "../data/customers";
+import { employees } from "../data/employees";
+import { tasks } from "../data/tasks";
+import { notifications } from "../data/notifications";
+
+export const AppContext = createContext();
+
+const initialState = {
+  users,
+  leads,
+  customers,
+  employees,
+  tasks,
+  notifications
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+
+    case "ADD_LEAD":
+      return { ...state, leads: [...state.leads, action.payload] };
+
+    case "ADD_CUSTOMER":
+      return { ...state, customers: [...state.customers, action.payload] };
+
+    case "ADD_TASK":
+      return { ...state, tasks: [...state.tasks, action.payload] };
+
+    default:
+      return state;
+  }
+}
+
+export function AppProvider({ children }) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  return (
+    <AppContext.Provider value={{ state, dispatch }}>
+      {children}
+    </AppContext.Provider>
+  );
+}
