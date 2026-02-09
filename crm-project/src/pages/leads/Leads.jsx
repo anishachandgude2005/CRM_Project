@@ -90,7 +90,7 @@ const Leads = () => {
 
   return (
     <div>
-      <h1>📌 Lead Management</h1>
+      <h2> Lead Management</h2>
 
       {/* FORM */}
       <div style={styles.form}>
@@ -112,8 +112,8 @@ const Leads = () => {
           <option>Lost</option>
         </select>
 
-        <button onClick={saveLead}>
-          {editId ? "Update Lead" : "Add Lead"}
+        <button style={styles.addBtn} onClick={saveLead}>
+        {editId ? "Update Lead" : "Add Lead"}
         </button>
       </div>
 
@@ -168,7 +168,44 @@ const styles = {
     gap: "10px",
     marginBottom: "20px",
     flexWrap: "wrap"
+  },
+  addBtn: {
+  backgroundColor: "#198754",   
+  color: "#fff",
+  border: "none",
+  padding: "8px 14px",
+  cursor: "pointer",
+  borderRadius: "4px"
+ },
+  viewBtn: {
+    backgroundColor: "#0d6efd",
+    color: "#fff",
+    border: "none",
+    padding: "6px 10px",
+    marginRight: "5px",
+    cursor: "pointer",
+    borderRadius: "4px"
+  },
+
+  editBtn: {
+    backgroundColor: "#198754",
+    color: "#fff",
+    border: "none",
+    padding: "6px 10px",
+    marginRight: "5px",
+    cursor: "pointer",
+    borderRadius: "4px"
+  },
+
+  deleteBtn: {
+    backgroundColor: "#dc3545",
+    color: "#fff",
+    border: "none",
+    padding: "6px 10px",
+    cursor: "pointer",
+    borderRadius: "4px"
   }
 };
+
 
 export default Leads;
