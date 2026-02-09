@@ -1,4 +1,4 @@
-import React, { createContext, useReducer } from "react";
+import React, { createContext, useReducer, useEffect } from "react";
 
 import { users } from "../data/users";
 import { leads } from "../data/leads";
@@ -13,16 +13,33 @@ const initialState = {
   users,
   leads,
   customers,
-  employees,
   tasks,
+  employees,
   notifications
 };
 
 function reducer(state, action) {
   switch (action.type) {
 
-    case "ADD_LEAD":
-      return { ...state, leads: [...state.leads, action.payload] };
+   case "ADD_LEAD":
+      return {
+        ...state,
+        leads: [action.payload, ...state.leads]
+      };
+
+    case "UPDATE_LEAD":
+       return {
+    ...state,
+    leads: state.leads.map(l =>
+      l.id === action.payload.id ? action.payload : l
+    )
+  };
+
+    case "DELETE_LEAD":
+      return {
+        ...state,
+        leads: state.leads.filter(l => l.id !== action.payload)
+      };
 
     case "ADD_CUSTOMER":
       return { ...state, customers: [...state.customers, action.payload] };
@@ -37,6 +54,11 @@ function reducer(state, action) {
 
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  // Save leads to localStorage
+  useEffect(() => {
+    localStorage.setItem("crm_leads", JSON.stringify(state.leads));
+  }, [state.leads]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
