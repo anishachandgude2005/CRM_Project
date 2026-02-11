@@ -45,7 +45,17 @@ function reducer(state, action) {
       return { ...state, customers: [...state.customers, action.payload] };
 
     case "ADD_TASK":
-      return { ...state, tasks: [...state.tasks, action.payload] };
+       return { ...state, tasks: [...state.tasks, action.payload] };
+
+    case "TOGGLE_TASK":
+  return {
+    ...state,
+    tasks: state.tasks.map(task =>
+      task.id === action.payload
+        ? { ...task, completed: !task.completed }
+        : task
+    )
+  };
 
     default:
       return state;

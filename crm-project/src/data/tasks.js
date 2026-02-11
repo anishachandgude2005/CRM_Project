@@ -1,5 +1,16 @@
 export const tasks = [
-  { id: 1, title: "Call Lead", completed: false },
-  { id: 2, title: "Send Proposal", completed: true },
-  { id: 3, title: "Follow Up", completed: false }
+  {
+    id: 1,
+    title: "Call New Lead",
+    assignedBy: "Sales User",
+    dueDate: "2026-02-15",
+    completed: false
+  },
+  {
+    id: 2,
+    title: "Send Proposal",
+    assignedBy: "Admin",
+    dueDate: "2026-02-12",
+    completed: true
+  }
 ];
