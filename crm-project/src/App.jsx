@@ -10,12 +10,15 @@ import Leads from "./pages/leads/Leads";
 import Profile from "./pages/profile/Profile";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import RoleRoute from "./routes/RoleRoute";
+import Customers from "./pages/Customer/Customers";
+import Tasks from "./pages/tasks/Tasks";
+import Employees from "./pages/employees/Employees";
 
 // Temporary placeholder pages (Phase 1)
 
-const Customers = () => <h1>Customers Page</h1>;
+
 const Employees = () => <h1>Employees Page</h1>;
-const Tasks = () => <h1>Tasks Page</h1>;
+
 const Reports = () => <h1>Reports Page</h1>;
 const Settings = () => <h1>Settings Page</h1>;
 
@@ -35,7 +38,7 @@ function App() {
         >
 
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/Leads" element={<Leads />} />
+          <Route path="/leads" element={<Leads />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/profile" element={<Profile />} />
