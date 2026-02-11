@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 
 const CUST_KEY = "crm_customers";
 
 const Customers = () => {
-  const [customers, setCustomers] = useState([]);
+ const { state, dispatch } = useContext(AppContext);
+ const customers = state.customers;
 
   const [form, setForm] = useState({
     name: "",
@@ -16,45 +18,30 @@ const Customers = () => {
 
   const [editId, setEditId] = useState(null);
 
-  // Load customers
-  useEffect(() => {
-    setCustomers(JSON.parse(localStorage.getItem(CUST_KEY)) || []);
-  }, []);
-
-  // Save customers
-  useEffect(() => {
-    localStorage.setItem(CUST_KEY, JSON.stringify(customers));
-  }, [customers]);
-
+  
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const saveCustomer = () => {
-    if (!form.name || !form.email) {
-      alert("Name & Email required");
-      return;
-    }
+ const saveCustomer = () => {
+  if (!form.name || !form.email) {
+    alert("Name & Email required");
+    return;
+  }
 
-    if (editId) {
-      setCustomers(
-        customers.map(c =>
-          c.id === editId ? { ...form, id: editId } : c
-        )
-      );
-      setEditId(null);
-    } else {
-      setCustomers([{ ...form, id: Date.now() }, ...customers]);
-    }
+  dispatch({
+    type: "ADD_CUSTOMER",
+    payload: { ...form, id: Date.now() }
+  });
 
-    setForm({
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      status: "Active"
-    });
-  };
+  setForm({
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    status: "Active"
+  });
+};
 
   const viewCustomer = (cust) => {
     alert(
