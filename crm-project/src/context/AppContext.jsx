@@ -44,6 +44,12 @@ function reducer(state, action) {
     case "ADD_CUSTOMER":
       return { ...state, customers: [...state.customers, action.payload] };
 
+    case "DELETE_CUSTOMER":
+       return {
+    ...state,
+    customers: state.customers.filter(c => c.id !== action.payload)
+  };
+
     case "ADD_TASK":
        return { ...state, tasks: [...state.tasks, action.payload] };
 
