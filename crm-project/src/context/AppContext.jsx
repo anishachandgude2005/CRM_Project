@@ -49,6 +49,29 @@ function reducer(state, action) {
     ...state,
     customers: state.customers.filter(c => c.id !== action.payload)
   };
+  case "ADD_EMPLOYEE":
+    return {
+      ...state,
+      employees: [action.payload, ...state.employees]
+    };
+
+  case "UPDATE_EMPLOYEE":
+    return {
+      ...state,
+      employees: state.employees.map(emp =>
+        emp.id === action.payload.id ? action.payload : emp
+      )
+    };
+
+  case "TOGGLE_EMPLOYEE":
+    return {
+      ...state,
+      employees: state.employees.map(emp =>
+        emp.id === action.payload
+          ? { ...emp, active: !emp.active }
+          : emp
+      )
+    };
 
     case "ADD_TASK":
        return { ...state, tasks: [...state.tasks, action.payload] };
