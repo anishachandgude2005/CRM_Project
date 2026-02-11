@@ -1,240 +1,190 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+
+const CUST_KEY = "crm_customers";
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
     company: "",
-    status: "Active",
+    status: "Active"
   });
+
   const [editId, setEditId] = useState(null);
+
+  // Load customers
+  useEffect(() => {
+    setCustomers(JSON.parse(localStorage.getItem(CUST_KEY)) || []);
+  }, []);
+
+  // Save customers
+  useEffect(() => {
+    localStorage.setItem(CUST_KEY, JSON.stringify(customers));
+  }, [customers]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (!form.name || !form.email || !form.phone) {
-      alert("Please fill all required fields");
+  const saveCustomer = () => {
+    if (!form.name || !form.email) {
+      alert("Name & Email required");
       return;
     }
 
     if (editId) {
-      // UPDATE
       setCustomers(
-        customers.map((cust) =>
-          cust.id === editId ? { ...cust, ...form } : cust
+        customers.map(c =>
+          c.id === editId ? { ...form, id: editId } : c
         )
       );
       setEditId(null);
     } else {
-      // CREATE
-      setCustomers([
-        ...customers,
-        {
-          id: Date.now(),
-          ...form,
-        },
-      ]);
+      setCustomers([{ ...form, id: Date.now() }, ...customers]);
     }
 
-    // RESET FORM
     setForm({
       name: "",
       email: "",
       phone: "",
       company: "",
-      status: "Active",
+      status: "Active"
     });
   };
 
-  const handleEdit = (cust) => {
-    setEditId(cust.id);
-    setForm(cust);
+  const viewCustomer = (cust) => {
+    alert(
+      `Customer Details\n\n` +
+      `Name: ${cust.name}\n` +
+      `Email: ${cust.email}\n` +
+      `Phone: ${cust.phone}\n` +
+      `Company: ${cust.company}\n` +
+      `Status: ${cust.status}`
+    );
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this customer?")) {
-      setCustomers(customers.filter((cust) => cust.id !== id));
+  const editCustomer = (cust) => {
+    setForm(cust);
+    setEditId(cust.id);
+  };
+
+  const deleteCustomer = (id) => {
+    if (window.confirm("Delete this customer?")) {
+      setCustomers(customers.filter(c => c.id !== id));
     }
   };
 
   return (
-    <div style={styles.page}>
-      <h1 style={styles.title}> Customer Management</h1>
+    <div>
+      <h2>Customer Management</h2>
 
       {/* FORM */}
-      <form onSubmit={handleSubmit} style={styles.row}>
-        <input
-          style={styles.input}
-          name="name"
-          placeholder="Customer Name"
-          value={form.name}
-          onChange={handleChange}
-        />
+      <div style={styles.form}>
+        <input name="name" placeholder="Customer Name" value={form.name} onChange={handleChange} />
+        <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
+        <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
+        <input name="company" placeholder="Company" value={form.company} onChange={handleChange} />
 
-        <input
-          style={styles.input}
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-        />
-
-        <input
-          style={styles.input}
-          name="phone"
-          placeholder="Phone"
-          value={form.phone}
-          onChange={handleChange}
-        />
-
-        <input
-          style={styles.input}
-          name="company"
-          placeholder="Company"
-          value={form.company}
-          onChange={handleChange}
-        />
-
-        <select
-          style={styles.input}
-          name="status"
-          value={form.status}
-          onChange={handleChange}
-        >
+        <select name="status" value={form.status} onChange={handleChange}>
           <option>Active</option>
           <option>Inactive</option>
         </select>
 
-        <button style={styles.button}>
+        <button style={styles.addBtn} onClick={saveCustomer}>
           {editId ? "Update Customer" : "Add Customer"}
         </button>
-      </form>
+      </div>
 
       {/* TABLE */}
-      <div style={styles.tableWrapper}>
-        <table style={styles.table}>
-          <thead>
+      <table border="1" width="1200" cellPadding="10">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Company</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {customers.length === 0 ? (
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Company</th>
-              <th>Status</th>
-              <th>Action</th>
+              <td colSpan="6" align="center">No Customers</td>
             </tr>
-          </thead>
-
-          <tbody>
-            {customers.length === 0 ? (
-              <tr>
-                <td colSpan="6" style={styles.noData}>
-                  No Customers Found
+          ) : (
+            customers.map(cust => (
+              <tr key={cust.id}>
+                <td>{cust.name}</td>
+                <td>{cust.email}</td>
+                <td>{cust.phone}</td>
+                <td>{cust.company}</td>
+                <td>{cust.status}</td>
+                <td>
+                  <button style={styles.viewBtn} onClick={() => viewCustomer(cust)}>
+                    <FaEye /> View
+                  </button>
+                  <button style={styles.editBtn} onClick={() => editCustomer(cust)}>
+                    <FaEdit /> Edit
+                  </button>
+                  <button style={styles.deleteBtn} onClick={() => deleteCustomer(cust.id)}>
+                    <FaTrash /> Delete
+                  </button>
                 </td>
               </tr>
-            ) : (
-              customers.map((cust) => (
-                <tr key={cust.id}>
-                  <td>{cust.name}</td>
-                  <td>{cust.email}</td>
-                  <td>{cust.phone}</td>
-                  <td>{cust.company || "-"}</td>
-                  <td>{cust.status}</td>
-                  <td>
-                    <button
-                      style={styles.editBtn}
-                      onClick={() => handleEdit(cust)}
-                    >
-                      Edit
-                    </button>{" "}
-                    <button
-                      style={styles.deleteBtn}
-                      onClick={() => handleDelete(cust.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+            ))
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-export default Customers;
-
-/* ================= STYLES ================= */
-
 const styles = {
-  page: {
-    width: "100%",
-    minHeight: "100vh",
-    padding: "20px",
-    background: "#1e1e1e",
-    color: "#fff",
-    boxSizing: "border-box",
-  },
-  title: {
-    fontSize: "32px",
-    fontWeight: "700",
+  form: {
+    display: "flex",
+    gap: "10px",
     marginBottom: "20px",
+    flexWrap: "wrap"
   },
-  row: {
-    display: "grid",
-    gridTemplateColumns: "repeat(6, 1fr)",
-    gap: "12px",
-    marginBottom: "20px",
-  },
-  input: {
-    padding: "12px",
-    background: "#2a2a2a",
-    border: "1px solid #555",
-    borderRadius: "6px",
-    color: "#fff",
-  },
-  button: {
-    background: "#000",
+  addBtn: {
+    backgroundColor: "#198754",
     color: "#fff",
     border: "none",
-    borderRadius: "8px",
-    fontWeight: "600",
+    padding: "8px 14px",
     cursor: "pointer",
+    borderRadius: "4px"
   },
-  tableWrapper: {
-    width: "100%",
-    background: "#222",
-    borderRadius: "8px",
-    overflow: "hidden",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-  noData: {
-    textAlign: "center",
-    padding: "30px",
-    color: "#aaa",
+  viewBtn: {
+    backgroundColor: "#0d6efd",
+    color: "#fff",
+    border: "none",
+    padding: "6px 10px",
+    marginRight: "5px",
+    cursor: "pointer",
+    borderRadius: "4px"
   },
   editBtn: {
-    padding: "6px 10px",
-    borderRadius: "6px",
+    backgroundColor: "#198754",
+    color: "#fff",
     border: "none",
+    padding: "6px 10px",
+    marginRight: "5px",
     cursor: "pointer",
+    borderRadius: "4px"
   },
   deleteBtn: {
-    padding: "6px 10px",
-    borderRadius: "6px",
-    border: "none",
-    background: "#b91c1c",
+    backgroundColor: "#dc3545",
     color: "#fff",
+    border: "none",
+    padding: "6px 10px",
     cursor: "pointer",
-  },
+    borderRadius: "4px"
+  }
 };
+
+export default Customers;
