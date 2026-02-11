@@ -1,32 +1,33 @@
-const Navbar = () => {
-    return (
-      <header style={styles.navbar}>
-        <h3>CRM Dashboard</h3>
-  
-        <button style={styles.logout}>Logout</button>
-      </header>
-    );
+import "./Navbar.css";
+import { useNavigate } from "react-router-dom";
+
+export default function Navbar() {
+  const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("crmUser"));
+
+  const handleLogout = () => {
+    localStorage.removeItem("crmUser");
+    navigate("/");
   };
-  
-  const styles = {
-    navbar: {
-      height: "60px",
-      padding: "0 20px",
-      borderBottom: "1px solid #ddd",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      background: "#fff"
-    },
-    logout: {
-      padding: "8px 12px",
-      border: "none",
-      background: "#ef4444",
-      color: "#fff",
-      borderRadius: "5px",
-      cursor: "pointer"
-    }
-  };
-  
-  export default Navbar;
-  
+
+  return (
+    <nav className="navbar shadow-sm px-4">
+      <h5 className="m-0 fw-bold">CRM Dashboard</h5>
+
+      {/* Right Side */}
+      <div className="ms-auto d-flex align-items-center gap-3">
+        <span className="fw-semibold">
+          Welcome {user?.role}
+        </span>
+
+        <button
+          className="btn btn-danger px-3"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
+      </div>
+    </nav>
+  );
+}

@@ -1,0 +1,9 @@
+.main-content {
+  margin-left: 240px;
+  min-height: 100vh;
+  background: #f4f6f9;
+}
+
+.page-content {
+  padding: 30px;
+}

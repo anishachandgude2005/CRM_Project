@@ -1,54 +1,60 @@
 import { NavLink } from "react-router-dom";
+import "./Sidebar.css";
 
-const Sidebar = () => {
+export default function Sidebar() {
+  const user = JSON.parse(localStorage.getItem("crmUser"));
+
   return (
-    <aside style={styles.sidebar}>
-      <h2 style={styles.logo}>CRM</h2>
+    <aside className="sidebar">
+      <h3 className="logo">CRM System</h3>
 
-      <NavLink to="/dashboard" style={styles.link}>
-        Dashboard
-      </NavLink>
+      <nav>
+        <NavLink to="/dashboard" className="nav-link">
+          Dashboard
+        </NavLink>
 
-      <NavLink to="/leads" style={styles.link}>
-        Leads
-      </NavLink>
+        {/* Admin + Manager */}
+        {(user?.role === "Admin" || user?.role === "Manager") && (
+          <>
+            <NavLink to="/leads" className="nav-link">
+              Leads
+            </NavLink>
 
-      <NavLink to="/customers" style={styles.link}>
-        Customers
-      </NavLink>
+            <NavLink to="/customers" className="nav-link">
+              Customers
+            </NavLink>
+          </>
+        )}
 
-      <NavLink to="/tasks" style={styles.link}>
-        Tasks
-      </NavLink>
+        {/* Admin Only */}
+        {user?.role === "Admin" && (
+          <NavLink to="/employees" className="nav-link">
+            Employees
+          </NavLink>
+        )}
 
-      <NavLink to="/reports" style={styles.link}>
-        Reports
-      </NavLink>
+        {/* All Roles */}
+        <NavLink to="/tasks" className="nav-link">
+          Tasks
+        </NavLink>
 
-      <NavLink to="/settings" style={styles.link}>
-        Settings
-      </NavLink>
+        {/* Admin + Manager */}
+        {(user?.role === "Admin" || user?.role === "Manager") && (
+          <NavLink to="/reports" className="nav-link">
+            Reports
+          </NavLink>
+        )}
+
+        {(user?.role === "Admin" || user?.role === "Manager") && (
+        <NavLink to="/settings" className="nav-link">
+          Settings
+        </NavLink>
+        )}
+
+        <NavLink to="/profile" className="nav-link">
+          My Profile
+        </NavLink>
+      </nav>
     </aside>
   );
-};
-
-const styles = {
-  sidebar: {
-    width: "220px",
-    minHeight: "100vh",
-    padding: "20px",
-    borderRight: "1px solid #ddd",
-    background: "#f9fafb"
-  },
-  logo: {
-    marginBottom: "20px"
-  },
-  link: {
-    display: "block",
-    padding: "10px 0",
-    textDecoration: "none",
-    color: "#333"
-  }
-};
-
-export default Sidebar;
+}

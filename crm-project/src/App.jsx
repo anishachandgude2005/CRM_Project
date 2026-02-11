@@ -6,11 +6,19 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import MainLayout from "./layouts/MainLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
+import Leads from "./pages/leads/Leads";
+import Profile from "./pages/profile/Profile";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import RoleRoute from "./routes/RoleRoute";
+import Customers from "./pages/Customer/Customers";
+import Tasks from "./pages/tasks/Tasks";
+import Employees from "./pages/employees/Employees";
 
 // Temporary placeholder pages (Phase 1)
-const Leads = () => <h1>Leads Page</h1>;
-const Customers = () => <h1>Customers Page</h1>;
-const Tasks = () => <h1>Tasks Page</h1>;
+
+
+const Employees = () => <h1>Employees Page</h1>;
+
 const Reports = () => <h1>Reports Page</h1>;
 const Settings = () => <h1>Settings Page</h1>;
 
@@ -20,15 +28,40 @@ function App() {
       <Routes>
       {/* Login Page */}
       <Route path="/login" element={<Login />} />
-
-        {/* Main Layout */}
-        <Route element={<MainLayout />}>
+      {/* Protected Layout */}
+      <Route
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leads" element={<Leads />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/tasks" element={<Tasks />} />
-          <Route path="/reports" element={<Reports />} />
+          <Route path="/profile" element={<Profile />} />
+          {/* Admin Only */}
+          <Route
+            path="/employees"
+            element={
+              <RoleRoute roles={["Admin"]}>
+                <Employees />
+              </RoleRoute>
+            }
+          />
+
+          {/* Admin + Manager */}
+          <Route
+            path="/reports"
+            element={
+              <RoleRoute roles={["Admin", "Manager"]}>
+                <Reports />
+              </RoleRoute>
+            }
+          />
+
           <Route path="/settings" element={<Settings />} />
         </Route>
         

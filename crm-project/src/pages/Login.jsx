@@ -85,12 +85,9 @@ const styles = {
     fontSize: "24px",
     fontWeight: "700",
     marginBottom: "5px",
+    color: "#2d2f36",
   },
-  subtitle: {
-    fontSize: "14px",
-    color: "#666",
-    marginBottom: "15px",
-  },
+  
   error: {
     color: "red",
     marginBottom: "10px",

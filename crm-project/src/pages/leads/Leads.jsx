@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+
+
 
 const LEAD_KEY = "crm_leads";
 const EMP_KEY = "crm_employees";
@@ -59,6 +62,18 @@ const Leads = () => {
       status: "New"
     });
   };
+  //View lead
+  const viewLead = (lead) => {
+  alert(
+    `Lead Details\n\n` +
+    `Name: ${lead.name}\n` +
+    `Email: ${lead.email}\n` +
+    `Phone: ${lead.phone}\n` +
+    `Employee: ${lead.assignedTo || "Not Assigned"}\n` +
+    `Status: ${lead.status}`
+  );
+};
+
 
   // Edit Lead
   const editLead = (lead) => {
@@ -75,7 +90,7 @@ const Leads = () => {
 
   return (
     <div>
-      <h1>📌 Lead Management</h1>
+      <h2> Lead Management</h2>
 
       {/* FORM */}
       <div style={styles.form}>
@@ -97,13 +112,13 @@ const Leads = () => {
           <option>Lost</option>
         </select>
 
-        <button onClick={saveLead}>
-          {editId ? "Update Lead" : "Add Lead"}
+        <button style={styles.addBtn} onClick={saveLead}>
+        {editId ? "Update Lead" : "Add Lead"}
         </button>
       </div>
 
       {/* TABLE */}
-      <table border="1" width="100%" cellPadding="10">
+      <table border="1" width="1200" cellPadding="10">
         <thead>
           <tr>
             <th>Name</th>
@@ -126,8 +141,17 @@ const Leads = () => {
                 <td>{lead.assignedTo || "-"}</td>
                 <td>{lead.status}</td>
                 <td>
-                  <button onClick={() => editLead(lead)}>Edit</button>
-                  <button onClick={() => deleteLead(lead.id)}>Delete</button>
+                  <button style={styles.viewBtn} onClick={() => viewLead(lead)}>
+                  <FaEye /> View
+                 </button>
+                  <button style={styles.editBtn} onClick={() => editLead(lead)}>
+                 <FaEdit /> Edit
+                  </button>
+
+                 <button style={styles.deleteBtn} onClick={() => deleteLead(lead.id)}>
+                 <FaTrash /> Delete
+                  </button>
+
                 </td>
               </tr>
             ))
@@ -144,7 +168,44 @@ const styles = {
     gap: "10px",
     marginBottom: "20px",
     flexWrap: "wrap"
+  },
+  addBtn: {
+  backgroundColor: "#198754",   
+  color: "#fff",
+  border: "none",
+  padding: "8px 14px",
+  cursor: "pointer",
+  borderRadius: "4px"
+ },
+  viewBtn: {
+    backgroundColor: "#0d6efd",
+    color: "#fff",
+    border: "none",
+    padding: "6px 10px",
+    marginRight: "5px",
+    cursor: "pointer",
+    borderRadius: "4px"
+  },
+
+  editBtn: {
+    backgroundColor: "#198754",
+    color: "#fff",
+    border: "none",
+    padding: "6px 10px",
+    marginRight: "5px",
+    cursor: "pointer",
+    borderRadius: "4px"
+  },
+
+  deleteBtn: {
+    backgroundColor: "#dc3545",
+    color: "#fff",
+    border: "none",
+    padding: "6px 10px",
+    cursor: "pointer",
+    borderRadius: "4px"
   }
 };
+
 
 export default Leads;

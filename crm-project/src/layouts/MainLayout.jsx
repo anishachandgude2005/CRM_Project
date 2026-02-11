@@ -1,21 +1,20 @@
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import { Outlet } from "react-router-dom";
+import "./MainLayout.css";
 
-const MainLayout = () => {
+export default function MainLayout() {
   return (
-    <div style={{ display: "flex" }}>
+    <div className="app-container">
       <Sidebar />
 
-      <div style={{ flex: 1 }}>
+      <div className="main-content">
         <Navbar />
 
-        <div style={{ padding: "20px" }}>
+        <div className="page-content">
           <Outlet />
         </div>
       </div>
     </div>
   );
-};
-
-export default MainLayout;
+}
