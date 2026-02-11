@@ -1,203 +1,91 @@
-import { useState } from "react";
+import React, { useContext, useState } from "react";
+import { AppContext } from "../../context/AppContext";
 
-const Tasks= () => {
-  const [tasks, setTasks] = useState([]);
-  const [form, setForm] = useState({
-    title: "",
-    assignedTo: "",
-    dueDate: "",
-    status: "Pending",
-    followUp: "",
-  });
-  const [editId, setEditId] = useState(null);
+export default function Tasks() {
+  const { state, dispatch } = useContext(AppContext);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [title, setTitle] = useState("");
+  const [assignedBy, setAssignedBy] = useState("");
+  const [dueDate, setDueDate] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (!form.title || !form.assignedTo || !form.dueDate) {
+  const addTask = () => {
+    if (!title || !assignedBy || !dueDate) {
       alert("Fill all fields");
       return;
     }
 
-    if (editId) {
-      setTasks(
-        tasks.map((t) =>
-          t.id === editId ? { ...t, ...form } : t
-        )
-      );
-      setEditId(null);
-    } else {
-      setTasks([...tasks, { id: Date.now(), ...form }]);
-    }
-
-    setForm({
-      title: "",
-      assignedTo: "",
-      dueDate: "",
-      status: "Pending",
-      followUp: "",
+    dispatch({
+      type: "ADD_TASK",
+      payload: {
+        id: Date.now(),
+        title,
+        assignedBy,
+        dueDate,
+        completed: false
+      }
     });
-  };
 
-  const handleEdit = (task) => {
-    setEditId(task.id);
-    setForm(task);
-  };
-
-  const handleDelete = (id) => {
-    if (window.confirm("Delete task?")) {
-      setTasks(tasks.filter((t) => t.id !== id));
-    }
-  };
-
-  const toggleStatus = (id) => {
-    setTasks(
-      tasks.map((t) =>
-        t.id === id
-          ? { ...t, status: t.status === "Completed" ? "Pending" : "Completed" }
-          : t
-      )
-    );
+    setTitle("");
+    setAssignedBy("");
+    setDueDate("");
   };
 
   return (
-    <div style={styles.page}>
-      <h1> Task  Management</h1>
+    <div className="container mt-3">
+      <h2>Task & Follow-up Module</h2>
 
-      {/* FORM */}
-      <form style={styles.row} onSubmit={handleSubmit}>
+      {/* TASK FORM */}
+      <div className="card p-3 mb-3 shadow-sm">
         <input
-          name="title"
+          className="form-control mb-2"
           placeholder="Task Title"
-          value={form.title}
-          onChange={handleChange}
-          style={styles.input}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
 
         <input
-          name="assignedTo"
-          placeholder="Assign To (Employee)"
-          value={form.assignedTo}
-          onChange={handleChange}
-          style={styles.input}
+          className="form-control mb-2"
+          placeholder="Assign By"
+          value={assignedBy}
+          onChange={(e) => setAssignedBy(e.target.value)}
         />
 
         <input
           type="date"
-          name="dueDate"
-          value={form.dueDate}
-          onChange={handleChange}
-          style={styles.input}
+          className="form-control mb-2"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
         />
 
-        <select
-          name="status"
-          value={form.status}
-          onChange={handleChange}
-          style={styles.input}
-        >
-          <option>Pending</option>
-          <option>Completed</option>
-        </select>
-
-        <input
-          name="followUp"
-          placeholder="Follow-up Notes"
-          value={form.followUp}
-          onChange={handleChange}
-          style={styles.input}
-        />
-
-        <button style={styles.button}>
-          {editId ? "Update Task" : "Add Task"}
+        <button className="btn btn-primary" onClick={addTask}>
+          Create Task
         </button>
-      </form>
+      </div>
 
-      {/* TABLE */}
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th>Task</th>
-            <th>Assigned To</th>
-            <th>Due Date</th>
-            <th>Status</th>
-            <th>Follow-up</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+      {/* TASK LIST */}
+      <div className="card shadow-sm p-3">
+        <h5>Task List</h5>
 
-        <tbody>
-          {tasks.length === 0 ? (
-            <tr>
-              <td colSpan="6" style={styles.noData}>
-                No Tasks Created
-              </td>
-            </tr>
-          ) : (
-            tasks.map((t) => (
-              <tr key={t.id}>
-                <td>{t.title}</td>
-                <td>{t.assignedTo}</td>
-                <td>{t.dueDate}</td>
-                <td>
-                  <button onClick={() => toggleStatus(t.id)}>
-                    {t.status}
-                  </button>
-                </td>
-                <td>{t.followUp || "-"}</td>
-                <td>
-                  <button onClick={() => handleEdit(t)}>Edit</button>{" "}
-                  <button onClick={() => handleDelete(t.id)}>Delete</button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+        {!state.tasks && <p>Tasks not loaded</p>}
+        {state.tasks?.length === 0 && <p>No tasks found</p>}
+
+        {state.tasks?.map(task => (
+          <div key={task.id} className="border p-2 mb-2 rounded d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{task.title}</strong><br />
+              Assigned: {task.assignedBy}<br />
+              Due: {task.dueDate}
+            </div>
+
+            <button
+              className={`btn ${task.completed ? "btn-success" : "btn-outline-success"}`}
+              onClick={() => dispatch({ type: "TOGGLE_TASK", payload: task.id })}
+            >
+              {task.completed ? "Completed" : "Mark Complete"}
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
-};
-
-export default Tasks;
-const styles = {
-  page: {
-    width: "100%",
-    minHeight: "100vh",
-    padding: "20px",
-    background: "#1e1e1e",
-    color: "#fff",
-  },
-  row: {
-    display: "grid",
-    gridTemplateColumns: "repeat(6, 1fr)",
-    gap: "10px",
-    marginBottom: "20px",
-  },
-  input: {
-    padding: "10px",
-    background: "#2a2a2a",
-    border: "1px solid #555",
-    color: "#fff",
-    borderRadius: "6px",
-  },
-  button: {
-    background: "#000",
-    color: "#fff",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-  noData: {
-    textAlign: "center",
-    padding: "20px",
-    color: "#aaa",
-  },
-};
+}
