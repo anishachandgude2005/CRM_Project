@@ -12,7 +12,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import RoleRoute from "./routes/RoleRoute";
 import Customers from "./pages/Customer/Customers";
 import Tasks from "./pages/tasks/Tasks";
-import Employees from "./pages/employees/Employees";
+// import Employees from "./pages/employees/Employees";
 
 // Temporary placeholder pages (Phase 1)
 
