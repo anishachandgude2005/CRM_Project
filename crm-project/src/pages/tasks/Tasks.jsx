@@ -1,17 +1,16 @@
 import React, { useContext, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 
-
-
 export default function Tasks() {
   const { state, dispatch } = useContext(AppContext);
 
   const [title, setTitle] = useState("");
   const [assignedBy, setAssignedBy] = useState("");
+  const [assignedTo, setAssignedTo] = useState("");
   const [dueDate, setDueDate] = useState("");
 
   const addTask = () => {
-    if (!title || !assignedBy || !dueDate) {
+    if (!title || !assignedBy || !assignedTo || !dueDate) {
       alert("Fill all fields");
       return;
     }
@@ -22,6 +21,7 @@ export default function Tasks() {
         id: Date.now(),
         title,
         assignedBy,
+        assignedTo,
         dueDate,
         completed: false
       }
@@ -29,6 +29,7 @@ export default function Tasks() {
 
     setTitle("");
     setAssignedBy("");
+    setAssignedTo("");
     setDueDate("");
   };
 
@@ -38,6 +39,8 @@ export default function Tasks() {
 
       {/* TASK FORM */}
       <div className="card p-3 mb-3 shadow-sm">
+
+        {/* Task Title */}
         <input
           className="form-control mb-2"
           placeholder="Task Title"
@@ -45,13 +48,32 @@ export default function Tasks() {
           onChange={(e) => setTitle(e.target.value)}
         />
 
-        <input
+        {/* Assigned By Dropdown */}
+        <select
           className="form-control mb-2"
-          placeholder="Assign By"
           value={assignedBy}
           onChange={(e) => setAssignedBy(e.target.value)}
-        />
+        >
+          <option value="">Select Assigned By</option>
+          <option value="Admin">Admin</option>
+          <option value="Manager">Manager</option>
+        </select>
 
+        {/* Assigned To (Leads Dropdown) */}
+        <select
+          className="form-control mb-2"
+          value={assignedTo}
+          onChange={(e) => setAssignedTo(e.target.value)}
+        >
+          <option value="">Select Lead</option>
+          {state.leads?.map((lead) => (
+            <option key={lead.id} value={lead.name}>
+              {lead.name}
+            </option>
+          ))}
+        </select>
+
+        {/* Due Date */}
         <input
           type="date"
           className="form-control mb-2"
@@ -68,20 +90,25 @@ export default function Tasks() {
       <div className="card shadow-sm p-3">
         <h5>Task List</h5>
 
-        {!state.tasks && <p>Tasks not loaded</p>}
         {state.tasks?.length === 0 && <p>No tasks found</p>}
 
         {state.tasks?.map(task => (
-          <div key={task.id} className="border p-2 mb-2 rounded d-flex justify-content-between align-items-center">
+          <div
+            key={task.id}
+            className="border p-2 mb-2 rounded d-flex justify-content-between align-items-center"
+          >
             <div>
               <strong>{task.title}</strong><br />
-              Assigned: {task.assignedBy}<br />
+              Assigned By: {task.assignedBy}<br />
+              Assigned To: {task.assignedTo}<br />
               Due: {task.dueDate}
             </div>
 
             <button
               className={`btn ${task.completed ? "btn-success" : "btn-outline-success"}`}
-              onClick={() => dispatch({ type: "TOGGLE_TASK", payload: task.id })}
+              onClick={() =>
+                dispatch({ type: "TOGGLE_TASK", payload: task.id })
+              }
             >
               {task.completed ? "Completed" : "Mark Complete"}
             </button>

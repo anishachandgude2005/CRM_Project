@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../../context/AppContext";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 
 const CUST_KEY = "crm_customers";
