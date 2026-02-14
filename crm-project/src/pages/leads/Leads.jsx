@@ -1,42 +1,29 @@
-import { useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
-
-
-
-const LEAD_KEY = "crm_leads";
-const EMP_KEY = "crm_employees";
+import { AppContext } from "../../context/AppContext";
 
 const Leads = () => {
-  const [leads, setLeads] = useState([]);
-  const [employees, setEmployees] = useState([]);
+  const { state, dispatch } = useContext(AppContext);
 
-  const [form, setForm] = useState({
+  const leads = state.leads;
+  const employees = state.employees;
+
+  const emptyForm = {
     name: "",
     email: "",
     phone: "",
     assignedTo: "",
     status: "New"
-  });
+  };
 
+  const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState(null);
 
-  // Load data
-  useEffect(() => {
-    setLeads(JSON.parse(localStorage.getItem(LEAD_KEY)) || []);
-    setEmployees(JSON.parse(localStorage.getItem(EMP_KEY)) || []);
-  }, []);
-
-  // Save leads
-  useEffect(() => {
-    localStorage.setItem(LEAD_KEY, JSON.stringify(leads));
-  }, [leads]);
-
-  // Handle input
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Add / Update Lead
+  // Add or update lead
   const saveLead = () => {
     if (!form.name || !form.email) {
       alert("Name & Email required");
@@ -44,59 +31,69 @@ const Leads = () => {
     }
 
     if (editId) {
-      setLeads(
-        leads.map(l =>
-          l.id === editId ? { ...form, id: editId } : l
-        )
-      );
+      dispatch({
+        type: "UPDATE_LEAD",
+        payload: { ...form, id: editId }
+      });
       setEditId(null);
     } else {
-      setLeads([{ ...form, id: Date.now() }, ...leads]);
+      dispatch({
+        type: "ADD_LEAD",
+        payload: { ...form, id: Date.now() }
+      });
     }
 
-    setForm({
-      name: "",
-      email: "",
-      phone: "",
-      assignedTo: "",
-      status: "New"
-    });
+    setForm(emptyForm);
   };
-  //View lead
-  const viewLead = (lead) => {
-  alert(
-    `Lead Details\n\n` +
-    `Name: ${lead.name}\n` +
-    `Email: ${lead.email}\n` +
-    `Phone: ${lead.phone}\n` +
-    `Employee: ${lead.assignedTo || "Not Assigned"}\n` +
-    `Status: ${lead.status}`
-  );
-};
 
-
-  // Edit Lead
   const editLead = (lead) => {
     setForm(lead);
     setEditId(lead.id);
   };
 
-  // Delete Lead
   const deleteLead = (id) => {
     if (window.confirm("Delete this lead?")) {
-      setLeads(leads.filter(l => l.id !== id));
+      dispatch({ type: "DELETE_LEAD", payload: id });
     }
   };
 
+  const viewLead = (lead) => {
+    alert(
+      `Lead Details\n\n` +
+        `Name: ${lead.name}\n` +
+        `Email: ${lead.email}\n` +
+        `Phone: ${lead.phone}\n` +
+        `Employee: ${lead.assignedTo || "Not Assigned"}\n` +
+        `Status: ${lead.status}`
+    );
+  };
+
   return (
-    <div>
-      <h2> Lead Management</h2>
+    <div className="container-fluid">
+      <h2 className="mb-3">Lead Management</h2>
 
       {/* FORM */}
       <div style={styles.form}>
-        <input name="name" placeholder="Lead Name" value={form.name} onChange={handleChange} />
-        <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
-        <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
+        <input
+          name="name"
+          placeholder="Lead Name"
+          value={form.name}
+          onChange={handleChange}
+        />
+
+        <input
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+        />
+
+        <input
+          name="phone"
+          placeholder="Phone"
+          value={form.phone}
+          onChange={handleChange}
+        />
 
         <select
           name="assignedTo"
@@ -113,7 +110,11 @@ const Leads = () => {
             ))}
         </select>
 
-        <select name="status" value={form.status} onChange={handleChange}>
+        <select
+          name="status"
+          value={form.status}
+          onChange={handleChange}
+        >
           <option>New</option>
           <option>Contacted</option>
           <option>Qualified</option>
@@ -121,25 +122,30 @@ const Leads = () => {
         </select>
 
         <button style={styles.addBtn} onClick={saveLead}>
-        {editId ? "Update Lead" : "Add Lead"}
+          {editId ? "Update Lead" : "Add Lead"}
         </button>
       </div>
 
       {/* TABLE */}
-      <table border="1" width="1200" cellPadding="10">
-        <thead>
+      <table className="table table-bordered table-hover">
+        <thead className="table-light">
           <tr>
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
             <th>Employee</th>
             <th>Status</th>
-            <th>Action</th>
+            <th width="200">Action</th>
           </tr>
         </thead>
+
         <tbody>
           {leads.length === 0 ? (
-            <tr><td colSpan="6" align="center">No Leads</td></tr>
+            <tr>
+              <td colSpan="6" align="center">
+                No Leads
+              </td>
+            </tr>
           ) : (
             leads.map(lead => (
               <tr key={lead.id}>
@@ -148,19 +154,32 @@ const Leads = () => {
                 <td>{lead.phone}</td>
                 <td>{lead.assignedTo || "-"}</td>
                 <td>{lead.status}</td>
+
                 <td>
-                  <button style={styles.viewBtn} onClick={() => viewLead(lead)}>
-                  <FaEye /> View
-                 </button>
-                  <button style={styles.editBtn} onClick={() => editLead(lead)}>
-                 <FaEdit /> Edit
-                  </button>
+                  <div className="d-flex gap-2">
+                    <button
+                      style={styles.viewBtn}
+                      onClick={() => viewLead(lead)}
+                    >
+                      <FaEye /> View
+                    </button>
 
-                 <button style={styles.deleteBtn} onClick={() => deleteLead(lead.id)}>
-                 <FaTrash /> Delete
-                  </button>
+                    <button
+                      style={styles.editBtn}
+                      onClick={() => editLead(lead)}
+                    >
+                      <FaEdit /> Edit
+                    </button>
 
+                    <button
+                      style={styles.deleteBtn}
+                      onClick={() => deleteLead(lead.id)}
+                    >
+                      <FaTrash /> Delete
+                    </button>
+                  </div>
                 </td>
+
               </tr>
             ))
           )}
@@ -177,43 +196,47 @@ const styles = {
     marginBottom: "20px",
     flexWrap: "wrap"
   },
+
   addBtn: {
-  backgroundColor: "#198754",   
-  color: "#fff",
-  border: "none",
-  padding: "8px 14px",
-  cursor: "pointer",
-  borderRadius: "4px"
- },
+    backgroundColor: "#0d6efd",
+    color: "#fff",
+    border: "none",
+    padding: "4px 10px",
+    fontSize: "13px",
+    borderRadius: "5px",
+    cursor: "pointer"
+  },
+
   viewBtn: {
     backgroundColor: "#0d6efd",
     color: "#fff",
     border: "none",
-    padding: "6px 10px",
-    marginRight: "5px",
-    cursor: "pointer",
-    borderRadius: "4px"
+    padding: "4px 10px",
+    fontSize: "13px",
+    borderRadius: "5px",
+    cursor: "pointer"
   },
-
+  
   editBtn: {
-    backgroundColor: "#198754",
-    color: "#fff",
+    backgroundColor: "#ffc107",
+    color: "#000",
     border: "none",
-    padding: "6px 10px",
-    marginRight: "5px",
-    cursor: "pointer",
-    borderRadius: "4px"
+    padding: "4px 10px",
+    fontSize: "13px",
+    borderRadius: "5px",
+    cursor: "pointer"
   },
-
+  
   deleteBtn: {
     backgroundColor: "#dc3545",
     color: "#fff",
     border: "none",
-    padding: "6px 10px",
-    cursor: "pointer",
-    borderRadius: "4px"
+    padding: "4px 10px",
+    fontSize: "13px",
+    borderRadius: "5px",
+    cursor: "pointer"
   }
+  
 };
-
 
 export default Leads;
