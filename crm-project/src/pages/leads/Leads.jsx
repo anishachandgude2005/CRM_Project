@@ -98,11 +98,19 @@ const Leads = () => {
         <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
         <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
 
-        <select name="assignedTo" value={form.assignedTo} onChange={handleChange}>
+        <select
+          name="assignedTo"
+          value={form.assignedTo}
+          onChange={handleChange}
+        >
           <option value="">Assign Employee</option>
-          {employees.map(emp => (
-            <option key={emp.id} value={emp.name}>{emp.name}</option>
-          ))}
+          {employees
+            .filter(emp => emp.active)
+            .map(emp => (
+              <option key={emp.id} value={emp.name}>
+                {emp.name}
+              </option>
+            ))}
         </select>
 
         <select name="status" value={form.status} onChange={handleChange}>
