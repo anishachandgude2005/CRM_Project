@@ -13,10 +13,11 @@ import RoleRoute from "./routes/RoleRoute";
 import Customers from "./pages/Customer/Customers";
 import Tasks from "./pages/tasks/Tasks";
 import Employees from "./pages/employees/Employees";
+import Reports from "./pages/reports/Reports";
 
 // Temporary placeholder pages (Phase 1)
 
-const Reports = () => <h1>Reports Page</h1>;
+// const Reports = () => <h1>Reports Page</h1>;
 const Settings = () => <h1>Settings Page</h1>;
 
 function App() {
