@@ -1,6 +1,6 @@
 import { useState } from "react";
-import AuthLayout from "./AuthLayout";
 import { useNavigate } from "react-router-dom";
+import AuthLayout from "./AuthLayout";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,36 +10,56 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    setError("");
+ const handleLogin = () => {
+  setError("");
 
-    if (!email) {
-      setError("Email is required");
-      return;
-    }
+  // Validation
+  if (!email) {
+    setError("Email is required");
+    return;
+  }
 
-    if (!password) {
-      setError("Password is required");
-      return;
-    }
+  if (!password) {
+    setError("Password is required");
+    return;
+  }
 
-    if (password.length < 4) {
-      setError("Password must be at least 4 characters");
-      return;
-    }
+  if (password.length < 4) {
+    setError("Password must be at least 4 characters");
+    return;
+  }
 
-    const user = { email, role };
-    localStorage.setItem("crmUser", JSON.stringify(user));
+  const storedUser = JSON.parse(localStorage.getItem("crmUser"));
 
+  // 🟢 First Time (No user stored)
+  if (!storedUser) {
+    const newUser = { email, password, role };
+    localStorage.setItem("crmUser", JSON.stringify(newUser));
     navigate("/dashboard");
-  };
+    return;
+  }
+
+  // 🟢 Same Email + Correct Password
+  if (storedUser.email === email && storedUser.password === password) {
+    navigate("/dashboard");
+    return;
+  }
+
+  // 🔴 Same Email + Wrong Password
+  if (storedUser.email === email && storedUser.password !== password) {
+    setError("Password is wrong");
+    return;
+  }
+
+  // 🟢 Different Email → Create New Account
+  const newUser = { email, password, role };
+  localStorage.setItem("crmUser", JSON.stringify(newUser));
+  navigate("/dashboard");
+};
 
   return (
-     
-      <div style={styles.container}>
-        <AuthLayout title="CRM Login">
-        
-
+    <div style={styles.container}>
+      <AuthLayout title="CRM Login">
         {error && <p style={styles.error}>{error}</p>}
 
         <input
@@ -71,9 +91,8 @@ export default function Login() {
         <button onClick={handleLogin} style={styles.button}>
           Login
         </button>
-         </AuthLayout>
-      </div>
-   
+      </AuthLayout>
+    </div>
   );
 }
 
@@ -81,13 +100,6 @@ const styles = {
   container: {
     textAlign: "center",
   },
-  title: {
-    fontSize: "24px",
-    fontWeight: "700",
-    marginBottom: "5px",
-    color: "#2d2f36",
-  },
-  
   error: {
     color: "red",
     marginBottom: "10px",
@@ -107,10 +119,10 @@ const styles = {
     padding: "12px",
     background: "#4f46e5",
     color: "#fff",
+    border: "none",
     borderRadius: "8px",
     fontWeight: "bold",
     fontSize: "15px",
     cursor: "pointer",
-    transition: "0.2s",
   },
 };
