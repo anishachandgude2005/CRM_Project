@@ -6,7 +6,7 @@ export default function Tasks() {
 
   const [title, setTitle] = useState("");
   const [assignedBy, setAssignedBy] = useState("");
-  const [assignedTo, setAssignedTo] = useState("");
+  const [assignedTo, setAssignedTo] = useState(""); // Employee
   const [dueDate, setDueDate] = useState("");
 
   const addTask = () => {
@@ -48,7 +48,7 @@ export default function Tasks() {
           onChange={(e) => setTitle(e.target.value)}
         />
 
-        {/* Assigned By Dropdown */}
+        {/* Assigned By */}
         <select
           className="form-control mb-2"
           value={assignedBy}
@@ -59,18 +59,21 @@ export default function Tasks() {
           <option value="Manager">Manager</option>
         </select>
 
-        {/* Assigned To (Leads Dropdown) */}
+        {/* Assigned To (Employee Dropdown) */}
         <select
           className="form-control mb-2"
           value={assignedTo}
           onChange={(e) => setAssignedTo(e.target.value)}
         >
-          <option value="">Select Lead</option>
-          {state.leads?.map((lead) => (
-            <option key={lead.id} value={lead.name}>
-              {lead.name}
-            </option>
-          ))}
+          <option value="">Select Employee</option>
+
+          {state.employees
+            ?.filter(emp => emp.active)   // Only active employees
+            .map(emp => (
+              <option key={emp.id} value={emp.name}>
+                {emp.name} ({emp.role})
+              </option>
+            ))}
         </select>
 
         {/* Due Date */}
