@@ -14,10 +14,10 @@ import Customers from "./pages/Customer/Customers";
 import Tasks from "./pages/tasks/Tasks";
 import Employees from "./pages/employees/Employees";
 import Reports from "./pages/reports/Reports";
-import Setting from "./pages/Settings.jsx";
+import Settings from "./pages/Settings";
 // Temporary placeholder pages (Phase 1)
 
-// const Reports = () => <h1>Reports Page</h1>;
+//  const Reports = () => <h1>Reports Page</h1>;
 
 
 function App() {
