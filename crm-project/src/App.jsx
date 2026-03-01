@@ -15,6 +15,7 @@ import Tasks from "./pages/tasks/Tasks";
 import Employees from "./pages/employees/Employees";
 import Reports from "./pages/reports/Reports";
 import Settings from "./pages/Settings";
+import Notifications from './pages/notification/Notification';
 // Temporary placeholder pages (Phase 1)
 
 //  const Reports = () => <h1>Reports Page</h1>;
@@ -40,6 +41,7 @@ function App() {
           <Route path="/customers" element={<Customers />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/notification" element={<Notifications/>}/>
           {/* Admin Only */}
           <Route
             path="/employees"

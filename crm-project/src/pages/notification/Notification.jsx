@@ -1,169 +1,86 @@
 import { useContext } from "react";
 import { AppContext } from "../../context/AppContext";
-import { FaBell, FaCheckCircle, FaTrash } from "react-icons/fa";
 
-const Notification = () => {
+export default function Notifications() {
   const { state, dispatch } = useContext(AppContext);
-  const notifications = state.notifications || [];
+  const notifications = state.notifications;
 
-  const unreadCount = notifications.filter(n => !n.read).length;
-
-  const markAsRead = (id) => {
+  const markRead = (id) => {
     dispatch({
-      type: "MARK_NOTIFICATION_READ",
+      type: "MARK_AS_READ",
       payload: id
     });
   };
 
-  const markAllRead = () => {
-    dispatch({ type: "MARK_ALL_READ" });
-  };
-
-  const deleteNotification = (id) => {
+  const markUnread = (id) => {
     dispatch({
-      type: "DELETE_NOTIFICATION",
+      type: "MARK_AS_UNREAD",
       payload: id
     });
   };
+
+  const unreadCount = notifications.filter(
+    (n) => !n.isRead
+  ).length;
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h2 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <FaBell /> Notifications
-        </h2>
+    <div className="container-fluid">
+      <h2 className="mb-3">
+        Notifications
+        {unreadCount > 0 && (
+          <span className="badge bg-danger ms-2">
+            {unreadCount}
+          </span>
+        )}
+      </h2>
 
-        <div>
-          <span style={styles.badge}>{unreadCount} Unread</span>
+      <table className="table table-bordered">
+        <thead className="table-light">
+          <tr>
+            <th>Message</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th width="200">Action</th>
+          </tr>
+        </thead>
 
-          {unreadCount > 0 && (
-            <button style={styles.markAllBtn} onClick={markAllRead}>
-              Mark All Read
-            </button>
+        <tbody>
+          {notifications.length === 0 ? (
+            <tr>
+              <td colSpan="4" align="center">
+                No Notifications
+              </td>
+            </tr>
+          ) : (
+            notifications.map((n) => (
+              <tr key={n.id}>
+                <td>{n.message}</td>
+                <td>{n.type}</td>
+                <td>
+                  {n.isRead ? "Read" : "Unread"}
+                </td>
+                <td>
+                  {n.isRead ? (
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => markUnread(n.id)}
+                    >
+                      Mark Unread
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-success btn-sm"
+                      onClick={() => markRead(n.id)}
+                    >
+                      Mark Read
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))
           )}
-        </div>
-      </div>
-
-      {notifications.length === 0 ? (
-        <div style={styles.emptyBox}>
-          <FaBell size={30} />
-          <p>No Notifications Available</p>
-        </div>
-      ) : (
-        notifications.map((note) => (
-          <div
-            key={note.id}
-            style={{
-              ...styles.card,
-              backgroundColor: note.read ? "#ffffff" : "#eef5ff",
-              borderLeft: note.read
-                ? "5px solid #ccc"
-                : "5px solid #0d6efd"
-            }}
-          >
-            <div style={styles.content}>
-              <p style={styles.message}>{note.message}</p>
-              <small style={styles.date}>{note.date}</small>
-            </div>
-
-            <div style={styles.actions}>
-              {!note.read && (
-                <button
-                  style={styles.readBtn}
-                  onClick={() => markAsRead(note.id)}
-                >
-                  <FaCheckCircle /> Read
-                </button>
-              )}
-
-              <button
-                style={styles.deleteBtn}
-                onClick={() => deleteNotification(note.id)}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          </div>
-        ))
-      )}
+        </tbody>
+      </table>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    padding: "25px",
-    maxWidth: "800px",
-    margin: "auto"
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "20px"
-  },
-  badge: {
-    backgroundColor: "#dc3545",
-    color: "#fff",
-    padding: "6px 12px",
-    borderRadius: "20px",
-    marginRight: "10px",
-    fontSize: "14px"
-  },
-  markAllBtn: {
-    backgroundColor: "#198754",
-    color: "#fff",
-    border: "none",
-    padding: "6px 12px",
-    borderRadius: "6px",
-    cursor: "pointer"
-  },
-  emptyBox: {
-    textAlign: "center",
-    padding: "40px",
-    backgroundColor: "#f8f9fa",
-    borderRadius: "8px"
-  },
-  card: {
-    padding: "15px",
-    marginBottom: "12px",
-    borderRadius: "8px",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-    transition: "0.3s"
-  },
-  content: {
-    flex: 1
-  },
-  message: {
-    margin: 0,
-    fontWeight: "500"
-  },
-  date: {
-    color: "#6c757d"
-  },
-  actions: {
-    display: "flex",
-    gap: "8px"
-  },
-  readBtn: {
-    backgroundColor: "#0d6efd",
-    color: "#fff",
-    border: "none",
-    padding: "6px 10px",
-    borderRadius: "5px",
-    cursor: "pointer"
-  },
-  deleteBtn: {
-    backgroundColor: "#dc3545",
-    color: "#fff",
-    border: "none",
-    padding: "6px 10px",
-    borderRadius: "5px",
-    cursor: "pointer"
-  }
-};
-
-export default Notification;
+}
