@@ -6,7 +6,7 @@ export default function Tasks() {
 
   const [title, setTitle] = useState("");
   const [assignedBy, setAssignedBy] = useState("");
-  const [assignedTo, setAssignedTo] = useState(""); // Employee
+  const [assignedTo, setAssignedTo] = useState("");
   const [dueDate, setDueDate] = useState("");
 
   const addTask = () => {
@@ -15,10 +15,14 @@ export default function Tasks() {
       return;
     }
 
+    // ✅ FIX 1: SAME ID FOR TASK & NOTIFICATION (important)
+    const id = Date.now();
+
+    // ✅ ADD TASK
     dispatch({
       type: "ADD_TASK",
       payload: {
-        id: Date.now(),
+        id,
         title,
         assignedBy,
         assignedTo,
@@ -27,6 +31,17 @@ export default function Tasks() {
       }
     });
 
+    // 🔔 ADD NOTIFICATION
+    dispatch({
+      type: "ADD_NOTIFICATION",
+      payload: {
+        id: id + 1, // ✅ FIX 2: avoid duplicate id issue
+        message: `📌 Task "${title}" assigned to ${assignedTo}`,
+        time: new Date().toLocaleString()
+      }
+    });
+
+    // RESET FORM
     setTitle("");
     setAssignedBy("");
     setAssignedTo("");
@@ -40,7 +55,6 @@ export default function Tasks() {
       {/* TASK FORM */}
       <div className="card p-3 mb-3 shadow-sm">
 
-        {/* Task Title */}
         <input
           className="form-control mb-2"
           placeholder="Task Title"
@@ -48,7 +62,6 @@ export default function Tasks() {
           onChange={(e) => setTitle(e.target.value)}
         />
 
-        {/* Assigned By */}
         <select
           className="form-control mb-2"
           value={assignedBy}
@@ -59,7 +72,6 @@ export default function Tasks() {
           <option value="Manager">Manager</option>
         </select>
 
-        {/* Assigned To (Employee Dropdown) */}
         <select
           className="form-control mb-2"
           value={assignedTo}
@@ -68,7 +80,7 @@ export default function Tasks() {
           <option value="">Select Employee</option>
 
           {state.employees
-            ?.filter(emp => emp.active)   // Only active employees
+            ?.filter(emp => emp.active)
             .map(emp => (
               <option key={emp.id} value={emp.name}>
                 {emp.name} ({emp.role})
@@ -76,7 +88,6 @@ export default function Tasks() {
             ))}
         </select>
 
-        {/* Due Date */}
         <input
           type="date"
           className="form-control mb-2"
@@ -108,10 +119,22 @@ export default function Tasks() {
             </div>
 
             <button
-              className={`btn ${task.completed ? "btn-success" : "btn-outline-success"}`}
-              onClick={() =>
-                dispatch({ type: "TOGGLE_TASK", payload: task.id })
-              }
+              className={`btn ${
+                task.completed ? "btn-success" : "btn-outline-success"
+              }`}
+              onClick={() => {
+                dispatch({ type: "TOGGLE_TASK", payload: task.id });
+
+                // 🔔 BONUS: notification when completed
+                dispatch({
+                  type: "ADD_NOTIFICATION",
+                  payload: {
+                    id: Date.now(),
+                    message: `✅ Task "${task.title}" completed`,
+                    time: new Date().toLocaleString()
+                  }
+                });
+              }}
             >
               {task.completed ? "Completed" : "Mark Complete"}
             </button>

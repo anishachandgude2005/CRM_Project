@@ -9,31 +9,37 @@ import { notifications } from "../data/notifications";
 
 export const AppContext = createContext();
 
+// ✅ Load from localStorage
+const savedNotifications =
+  JSON.parse(localStorage.getItem("crm_notifications")) || notifications;
+
 const initialState = {
   users,
   leads,
   customers,
   tasks,
   employees,
-  notifications
+  notifications: savedNotifications
 };
 
 function reducer(state, action) {
+  console.log("ACTION:", action); // ✅ DEBUG
+
   switch (action.type) {
 
-   case "ADD_LEAD":
+    case "ADD_LEAD":
       return {
         ...state,
         leads: [action.payload, ...state.leads]
       };
 
     case "UPDATE_LEAD":
-       return {
-    ...state,
-    leads: state.leads.map(l =>
-      l.id === action.payload.id ? action.payload : l
-    )
-  };
+      return {
+        ...state,
+        leads: state.leads.map(l =>
+          l.id === action.payload.id ? action.payload : l
+        )
+      };
 
     case "DELETE_LEAD":
       return {
@@ -41,50 +47,105 @@ function reducer(state, action) {
         leads: state.leads.filter(l => l.id !== action.payload)
       };
 
+    // 🔁 Convert Lead → Customer
+    case "CONVERT_LEAD": {
+      const lead = action.payload;
+
+      const newCustomer = {
+        id: Date.now(),
+        name: lead.name,
+        email: lead.email,
+        phone: lead.phone,
+        company: "",
+        status: "Active",
+        leadId: lead.id
+      };
+
+      return {
+        ...state,
+        customers: [newCustomer, ...state.customers],
+        leads: state.leads.filter(l => l.id !== lead.id)
+      };
+    }
+
     case "ADD_CUSTOMER":
-      return { ...state, customers: [...state.customers, action.payload] };
+      return {
+        ...state,
+        customers: [...state.customers, action.payload]
+      };
 
     case "DELETE_CUSTOMER":
-       return {
-    ...state,
-    customers: state.customers.filter(c => c.id !== action.payload)
-  };
-  case "ADD_EMPLOYEE":
-    return {
-      ...state,
-      employees: [action.payload, ...state.employees]
-    };
+      return {
+        ...state,
+        customers: state.customers.filter(c => c.id !== action.payload)
+      };
 
-  case "UPDATE_EMPLOYEE":
-    return {
-      ...state,
-      employees: state.employees.map(emp =>
-        emp.id === action.payload.id ? action.payload : emp
-      )
-    };
+    case "ADD_EMPLOYEE":
+      return {
+        ...state,
+        employees: [action.payload, ...state.employees]
+      };
 
-  case "TOGGLE_EMPLOYEE":
-    return {
-      ...state,
-      employees: state.employees.map(emp =>
-        emp.id === action.payload
-          ? { ...emp, active: !emp.active }
-          : emp
-      )
-    };
+    case "UPDATE_EMPLOYEE":
+      return {
+        ...state,
+        employees: state.employees.map(emp =>
+          emp.id === action.payload.id ? action.payload : emp
+        )
+      };
+
+    case "TOGGLE_EMPLOYEE":
+      return {
+        ...state,
+        employees: state.employees.map(emp =>
+          emp.id === action.payload
+            ? { ...emp, active: !emp.active }
+            : emp
+        )
+      };
 
     case "ADD_TASK":
-       return { ...state, tasks: [...state.tasks, action.payload] };
+      return {
+        ...state,
+        tasks: [...state.tasks, action.payload]
+      };
 
     case "TOGGLE_TASK":
-  return {
-    ...state,
-    tasks: state.tasks.map(task =>
-      task.id === action.payload
-        ? { ...task, completed: !task.completed }
-        : task
-    )
-  };
+      return {
+        ...state,
+        tasks: state.tasks.map(task =>
+          task.id === action.payload
+            ? { ...task, completed: !task.completed }
+            : task
+        )
+      };
+
+    // 🔔 NOTIFICATIONS (FIXED)
+    case "ADD_NOTIFICATION":
+      return {
+        ...state,
+        notifications: [
+          {
+            ...action.payload,
+            id: Date.now() + Math.random() // ✅ FIX
+          },
+          ...state.notifications
+        ]
+      };
+
+    case "DELETE_NOTIFICATION":
+      return {
+        ...state,
+        notifications: state.notifications.filter(
+          n => n.id !== action.payload
+        )
+      };
+
+    case "CLEAR_NOTIFICATIONS":
+      return {
+        ...state,
+        notifications: []
+      };
 
     default:
       return state;
@@ -94,10 +155,18 @@ function reducer(state, action) {
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // Save leads to localStorage
+  // Save leads
   useEffect(() => {
     localStorage.setItem("crm_leads", JSON.stringify(state.leads));
   }, [state.leads]);
+
+  // Save notifications
+  useEffect(() => {
+    localStorage.setItem(
+      "crm_notifications",
+      JSON.stringify(state.notifications)
+    );
+  }, [state.notifications]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

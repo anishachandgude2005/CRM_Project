@@ -1,6 +1,6 @@
-import { useContext, useState } from "react";
-import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+import { useState, useContext } from "react";
 import { AppContext } from "../../context/AppContext";
+import { FaEdit, FaTrash, FaEye, FaPlus, FaExchangeAlt } from "react-icons/fa";
 
 const Leads = () => {
   const { state, dispatch } = useContext(AppContext);
@@ -8,22 +8,22 @@ const Leads = () => {
   const leads = state.leads;
   const employees = state.employees;
 
-  const emptyForm = {
+  const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState(null);
+
+  const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
     assignedTo: "",
     status: "New"
-  };
-
-  const [form, setForm] = useState(emptyForm);
-  const [editId, setEditId] = useState(null);
+  });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Add or update lead
+  // ✅ SAVE LEAD (FIXED)
   const saveLead = () => {
     if (!form.name || !form.email) {
       alert("Name & Email required");
@@ -35,119 +35,195 @@ const Leads = () => {
         type: "UPDATE_LEAD",
         payload: { ...form, id: editId }
       });
+
+      // 🔔 FIX: delay
+      setTimeout(() => {
+        dispatch({
+          type: "ADD_NOTIFICATION",
+          payload: {
+            id: Date.now(),
+            message: "✏ Lead Updated",
+            time: new Date().toLocaleString()
+          }
+        });
+      }, 100);
+
       setEditId(null);
+
     } else {
+      const newLead = { ...form, id: Date.now() };
+
       dispatch({
         type: "ADD_LEAD",
-        payload: { ...form, id: Date.now() }
+        payload: newLead
       });
+
+      // 🔔 FIX: delay
+      setTimeout(() => {
+        dispatch({
+          type: "ADD_NOTIFICATION",
+          payload: {
+            id: Date.now(),
+            message: "✅ New Lead Added",
+            time: new Date().toLocaleString()
+          }
+        });
+      }, 100);
     }
 
-    setForm(emptyForm);
+    setForm({
+      name: "",
+      email: "",
+      phone: "",
+      assignedTo: "",
+      status: "New"
+    });
+
+    setShowForm(false);
   };
 
-  const editLead = (lead) => {
-    setForm(lead);
-    setEditId(lead.id);
-  };
-
-  const deleteLead = (id) => {
-    if (window.confirm("Delete this lead?")) {
-      dispatch({ type: "DELETE_LEAD", payload: id });
-    }
-  };
-
+  // 👁 VIEW
   const viewLead = (lead) => {
     alert(
       `Lead Details\n\n` +
-        `Name: ${lead.name}\n` +
-        `Email: ${lead.email}\n` +
-        `Phone: ${lead.phone}\n` +
-        `Employee: ${lead.assignedTo || "Not Assigned"}\n` +
-        `Status: ${lead.status}`
+      `Name: ${lead.name}\n` +
+      `Email: ${lead.email}\n` +
+      `Phone: ${lead.phone}\n` +
+      `Employee: ${lead.assignedTo || "Not Assigned"}\n` +
+      `Status: ${lead.status}`
     );
   };
 
+  // ✏ EDIT
+  const editLead = (lead) => {
+    setForm(lead);
+    setEditId(lead.id);
+    setShowForm(true);
+  };
+
+  // ❌ DELETE
+  const deleteLead = (id) => {
+    if (window.confirm("Delete this lead?")) {
+      dispatch({
+        type: "DELETE_LEAD",
+        payload: id
+      });
+
+      // 🔔 FIX
+      setTimeout(() => {
+        dispatch({
+          type: "ADD_NOTIFICATION",
+          payload: {
+            id: Date.now(),
+            message: "❌ Lead Deleted",
+            time: new Date().toLocaleString()
+          }
+        });
+      }, 100);
+    }
+  };
+
+  // 🔁 CONVERT
+  const convertToCustomer = (lead) => {
+    if (window.confirm("Convert this lead to customer?")) {
+      dispatch({
+        type: "CONVERT_LEAD",
+        payload: lead
+      });
+
+      // 🔔 FIX
+      setTimeout(() => {
+        dispatch({
+          type: "ADD_NOTIFICATION",
+          payload: {
+            id: Date.now(),
+            message: "🔁 Lead Converted to Customer",
+            time: new Date().toLocaleString()
+          }
+        });
+      }, 100);
+    }
+  };
+
   return (
-    <div className="container-fluid">
-      <h2 className="mb-3">Lead Management</h2>
+    <div style={{ padding: "20px" }}>
+      <div style={styles.header}>
+        <h2>Lead Management</h2>
 
-      {/* FORM */}
-      <div style={styles.form}>
-        <input
-          name="name"
-          placeholder="Lead Name"
-          value={form.name}
-          onChange={handleChange}
-        />
-
-        <input
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-        />
-
-        <input
-          name="phone"
-          placeholder="Phone"
-          value={form.phone}
-          onChange={handleChange}
-        />
-
-        <select
-          name="assignedTo"
-          value={form.assignedTo}
-          onChange={handleChange}
-        >
-          <option value="">Assign Employee</option>
-          {employees
-            .filter(emp => emp.active)
-            .map(emp => (
-              <option key={emp.id} value={emp.name}>
-                {emp.name}
-              </option>
-            ))}
-        </select>
-
-        <select
-          name="status"
-          value={form.status}
-          onChange={handleChange}
-        >
-          <option>New</option>
-          <option>Contacted</option>
-          <option>Qualified</option>
-          <option>Lost</option>
-        </select>
-
-        <button style={styles.addBtn} onClick={saveLead}>
-          {editId ? "Update Lead" : "Add Lead"}
+        <button style={styles.addBtn} onClick={() => setShowForm(true)}>
+          <FaPlus /> Add Lead
         </button>
       </div>
 
+      {/* MODAL */}
+      {showForm && (
+        <div style={styles.overlay} onClick={() => setShowForm(false)}>
+          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h3>{editId ? "Update Lead" : "Add New Lead"}</h3>
+
+            <input name="name" placeholder="Lead Name" value={form.name} onChange={handleChange} />
+            <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
+            <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
+
+            <select name="assignedTo" value={form.assignedTo} onChange={handleChange}>
+              <option value="">Assign Employee</option>
+              {employees.map((emp) => (
+                <option key={emp.id} value={emp.name}>
+                  {emp.name}
+                </option>
+              ))}
+            </select>
+
+            <select name="status" value={form.status} onChange={handleChange}>
+              <option>New</option>
+              <option>Contacted</option>
+              <option>Qualified</option>
+              <option>Lost</option>
+            </select>
+
+            <div style={{ marginTop: "15px" }}>
+              <button style={styles.saveBtn} onClick={saveLead}>Save</button>
+
+              <button
+                style={styles.cancelBtn}
+                onClick={() => {
+                  setShowForm(false);
+                  setForm({
+                    name: "",
+                    email: "",
+                    phone: "",
+                    assignedTo: "",
+                    status: "New"
+                  });
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* TABLE */}
-      <table className="table table-bordered table-hover">
-        <thead className="table-light">
+      <table border="1" width="100%" cellPadding="10">
+        <thead>
           <tr>
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
-            <th>Employee</th>
+            <th>Assigned To</th>
             <th>Status</th>
-            <th width="200">Action</th>
+            <th>Action</th>
           </tr>
         </thead>
 
         <tbody>
           {leads.length === 0 ? (
             <tr>
-              <td colSpan="6" align="center">
-                No Leads
-              </td>
+              <td colSpan="6" align="center">No Leads</td>
             </tr>
           ) : (
-            leads.map(lead => (
+            leads.map((lead) => (
               <tr key={lead.id}>
                 <td>{lead.name}</td>
                 <td>{lead.email}</td>
@@ -156,30 +232,22 @@ const Leads = () => {
                 <td>{lead.status}</td>
 
                 <td>
-                  <div className="d-flex gap-2">
-                    <button
-                      style={styles.viewBtn}
-                      onClick={() => viewLead(lead)}
-                    >
-                      <FaEye /> View
-                    </button>
+                  <button style={styles.viewBtn} onClick={() => viewLead(lead)}>
+                    <FaEye /> View
+                  </button>
 
-                    <button
-                      style={styles.editBtn}
-                      onClick={() => editLead(lead)}
-                    >
-                      <FaEdit /> Edit
-                    </button>
+                  <button style={styles.editBtn} onClick={() => editLead(lead)}>
+                    <FaEdit /> Edit
+                  </button>
 
-                    <button
-                      style={styles.deleteBtn}
-                      onClick={() => deleteLead(lead.id)}
-                    >
-                      <FaTrash /> Delete
-                    </button>
-                  </div>
+                  <button style={styles.convertBtn} onClick={() => convertToCustomer(lead)}>
+                    <FaExchangeAlt /> Convert
+                  </button>
+
+                  <button style={styles.deleteBtn} onClick={() => deleteLead(lead.id)}>
+                    <FaTrash /> Delete
+                  </button>
                 </td>
-
               </tr>
             ))
           )}
@@ -190,53 +258,16 @@ const Leads = () => {
 };
 
 const styles = {
-  form: {
-    display: "flex",
-    gap: "10px",
-    marginBottom: "20px",
-    flexWrap: "wrap"
-  },
-
-  addBtn: {
-    backgroundColor: "#0d6efd",
-    color: "#fff",
-    border: "none",
-    padding: "4px 10px",
-    fontSize: "13px",
-    borderRadius: "5px",
-    cursor: "pointer"
-  },
-
-  viewBtn: {
-    backgroundColor: "#0d6efd",
-    color: "#fff",
-    border: "none",
-    padding: "4px 10px",
-    fontSize: "13px",
-    borderRadius: "5px",
-    cursor: "pointer"
-  },
-  
-  editBtn: {
-    backgroundColor: "#ffc107",
-    color: "#000",
-    border: "none",
-    padding: "4px 10px",
-    fontSize: "13px",
-    borderRadius: "5px",
-    cursor: "pointer"
-  },
-  
-  deleteBtn: {
-    backgroundColor: "#dc3545",
-    color: "#fff",
-    border: "none",
-    padding: "4px 10px",
-    fontSize: "13px",
-    borderRadius: "5px",
-    cursor: "pointer"
-  }
-  
+  header: { display: "flex", justifyContent: "space-between", marginBottom: "20px" },
+  addBtn: { background: "#0d6efd", color: "#fff", padding: "8px 15px", border: "none", borderRadius: "6px", cursor: "pointer" },
+  viewBtn: { backgroundColor: "#0d6efd", color: "#fff", border: "none", padding: "6px 12px", marginRight: "8px", borderRadius: "6px", cursor: "pointer" },
+  editBtn: { backgroundColor: "#198754", color: "#fff", border: "none", padding: "6px 12px", marginRight: "8px", borderRadius: "6px", cursor: "pointer" },
+  convertBtn: { backgroundColor: "#6f42c1", color: "#fff", border: "none", padding: "6px 12px", marginRight: "8px", borderRadius: "6px", cursor: "pointer" },
+  deleteBtn: { backgroundColor: "#dc3545", color: "#fff", border: "none", padding: "6px 12px", borderRadius: "6px", cursor: "pointer" },
+  overlay: { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center" },
+  modal: { background: "#fff", padding: "25px", borderRadius: "10px", width: "400px", display: "flex", flexDirection: "column", gap: "10px" },
+  saveBtn: { background: "#198754", color: "#fff", border: "none", padding: "8px 12px", marginRight: "10px", borderRadius: "5px" },
+  cancelBtn: { background: "#dc3545", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "5px" }
 };
 
 export default Leads;

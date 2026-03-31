@@ -5,9 +5,9 @@ import { FaEdit, FaTrash, FaEye, FaPlus } from "react-icons/fa";
 const Customers = () => {
   const { state, dispatch } = useContext(AppContext);
 
-  const currentUser = state.currentUser; // Logged in user
+  const currentUser = state.currentUser;
 
-  // 🔥 Role Based Customer Filter
+  // 🔥 Role Based Filter
   const customers =
     currentUser?.role === "Lead"
       ? state.customers.filter((c) => c.leadId === currentUser.id)
@@ -29,7 +29,7 @@ const Customers = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ✅ Save Customer
+  // ✅ SAVE CUSTOMER (FINAL FIXED)
   const saveCustomer = () => {
     if (!form.name || !form.email) {
       alert("Name & Email required");
@@ -37,18 +37,49 @@ const Customers = () => {
     }
 
     if (editId) {
+      // ✏ UPDATE
       dispatch({
         type: "UPDATE_CUSTOMER",
         payload: { ...form, id: editId }
       });
+
+      // 🔔 Notification (with delay)
+      setTimeout(() => {
+        dispatch({
+          type: "ADD_NOTIFICATION",
+          payload: {
+            id: Date.now(),
+            message: "✏ Customer Updated",
+            time: new Date().toLocaleString()
+          }
+        });
+      }, 100);
+
       setEditId(null);
+
     } else {
+      // ➕ ADD
+      const newCustomer = { ...form, id: Date.now() };
+
       dispatch({
         type: "ADD_CUSTOMER",
-        payload: { ...form, id: Date.now() }
+        payload: newCustomer
       });
+
+      // 🔔 Notification (with delay)
+      setTimeout(() => {
+        dispatch({
+          type: "ADD_NOTIFICATION",
+          payload: {
+            id: Date.now(),
+            message: "👤 New Customer Added",
+            time: new Date().toLocaleString()
+          }
+        });
+      }, 100);
     }
 
+    // Reset form
     setForm({
       name: "",
       email: "",
@@ -61,28 +92,44 @@ const Customers = () => {
     setShowForm(false);
   };
 
-  // ✅ View Customer
+  // 👁 VIEW
   const viewCustomer = (cust) => {
     alert(
       `Customer Details\n\n` +
       `Name: ${cust.name}\n` +
       `Email: ${cust.email}\n` +
-      `Phone: ${cust.phone}`
+      `Phone: ${cust.phone}\n` +
+      `Company: ${cust.company}\n` +
+      `Status: ${cust.status}`
     );
   };
 
+  // ✏ EDIT
   const editCustomer = (cust) => {
     setForm(cust);
     setEditId(cust.id);
     setShowForm(true);
   };
 
+  // ❌ DELETE
   const deleteCustomer = (id) => {
     if (window.confirm("Delete this customer?")) {
       dispatch({
         type: "DELETE_CUSTOMER",
         payload: id
       });
+
+      // 🔔 Notification (with delay)
+      setTimeout(() => {
+        dispatch({
+          type: "ADD_NOTIFICATION",
+          payload: {
+            id: Date.now(),
+            message: "❌ Customer Deleted",
+            time: new Date().toLocaleString()
+          }
+        });
+      }, 100);
     }
   };
 
@@ -96,7 +143,7 @@ const Customers = () => {
         </button>
       </div>
 
-      {/* MODAL FORM */}
+      {/* MODAL */}
       {showForm && (
         <div style={styles.overlay}>
           <div style={styles.modal}>
@@ -116,7 +163,14 @@ const Customers = () => {
               <button style={styles.saveBtn} onClick={saveCustomer}>
                 Save
               </button>
-              <button style={styles.cancelBtn} onClick={() => setShowForm(false)}>
+
+              <button
+                style={styles.cancelBtn}
+                onClick={() => {
+                  setShowForm(false);
+                  setEditId(null);
+                }}
+              >
                 Cancel
               </button>
             </div>
@@ -136,6 +190,7 @@ const Customers = () => {
             <th>Action</th>
           </tr>
         </thead>
+
         <tbody>
           {customers.length === 0 ? (
             <tr>
@@ -149,28 +204,17 @@ const Customers = () => {
                 <td>{cust.phone}</td>
                 <td>{cust.company}</td>
                 <td>{cust.status}</td>
+
                 <td>
-                  {/* View */}
-                  <button
-                    style={styles.viewBtn}
-                    onClick={() => viewCustomer(cust)}
-                  >
+                  <button style={styles.viewBtn} onClick={() => viewCustomer(cust)}>
                     <FaEye /> View
                   </button>
 
-                  {/* Edit */}
-                  <button
-                    style={styles.editBtn}
-                    onClick={() => editCustomer(cust)}
-                  >
+                  <button style={styles.editBtn} onClick={() => editCustomer(cust)}>
                     <FaEdit /> Edit
                   </button>
 
-                  {/* Delete */}
-                  <button
-                    style={styles.deleteBtn}
-                    onClick={() => deleteCustomer(cust.id)}
-                  >
+                  <button style={styles.deleteBtn} onClick={() => deleteCustomer(cust.id)}>
                     <FaTrash /> Delete
                   </button>
                 </td>

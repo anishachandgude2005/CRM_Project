@@ -14,6 +14,7 @@ import Employees from "./pages/employees/Employees";
 import Reports from "./pages/reports/Reports";
 import Settings from "./pages/Settings";
 import Notifications from './pages/notification/Notification';
+import NotificationPopup from "./components/NotificationPopup";
 // Temporary placeholder pages (Phase 1)
 
 //  const Reports = () => <h1>Reports Page</h1>;
@@ -22,25 +23,29 @@ import Notifications from './pages/notification/Notification';
 function App() {
   return (
     <BrowserRouter>
+
+      {/* ✅ CORRECT PLACE */}
+      <NotificationPopup />
+
       <Routes>
-      {/* Login Page */}
-      <Route path="/login" element={<Login />} />
-      {/* Protected Layout */}
-      <Route
+        {/* Login Page */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected Layout */}
+        <Route
           element={
             <ProtectedRoute>
               <MainLayout />
             </ProtectedRoute>
           }
         >
-
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leads" element={<Leads />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/notification" element={<Notifications/>}/>
-          {/* Admin Only */}
+          <Route path="/notification" element={<Notifications />} />
+
           <Route
             path="/employees"
             element={
@@ -50,7 +55,6 @@ function App() {
             }
           />
 
-          {/* Admin + Manager */}
           <Route
             path="/reports"
             element={
@@ -62,12 +66,12 @@ function App() {
 
           <Route path="/settings" element={<Settings />} />
         </Route>
-        
+
         {/* Default */}
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="*" element={<Navigate to="/login" />} />
-
       </Routes>
+
     </BrowserRouter>
   );
 }

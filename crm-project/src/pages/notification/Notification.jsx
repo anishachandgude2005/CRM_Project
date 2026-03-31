@@ -1,86 +1,79 @@
 import { useContext } from "react";
 import { AppContext } from "../../context/AppContext";
+import { FaTrash } from "react-icons/fa";
 
-export default function Notifications() {
+const Notification = () => {
   const { state, dispatch } = useContext(AppContext);
-  const notifications = state.notifications;
 
-  const markRead = (id) => {
-    dispatch({
-      type: "MARK_AS_READ",
-      payload: id
-    });
-  };
-
-  const markUnread = (id) => {
-    dispatch({
-      type: "MARK_AS_UNREAD",
-      payload: id
-    });
-  };
-
-  const unreadCount = notifications.filter(
-    (n) => !n.isRead
-  ).length;
+  // ✅ FIX
+  const notifications = state.notifications || [];
 
   return (
-    <div className="container-fluid">
-      <h2 className="mb-3">
-        Notifications
-        {unreadCount > 0 && (
-          <span className="badge bg-danger ms-2">
-            {unreadCount}
-          </span>
-        )}
-      </h2>
+    <div style={{ padding: "20px" }}>
+      <h2>🔔 Notifications ({notifications.length})</h2>
 
-      <table className="table table-bordered">
-        <thead className="table-light">
-          <tr>
-            <th>Message</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th width="200">Action</th>
-          </tr>
-        </thead>
+      <button
+        style={styles.clearBtn}
+        onClick={() => dispatch({ type: "CLEAR_NOTIFICATIONS" })}
+      >
+        Clear All
+      </button>
 
-        <tbody>
-          {notifications.length === 0 ? (
-            <tr>
-              <td colSpan="4" align="center">
-                No Notifications
-              </td>
-            </tr>
-          ) : (
-            notifications.map((n) => (
-              <tr key={n.id}>
-                <td>{n.message}</td>
-                <td>{n.type}</td>
-                <td>
-                  {n.isRead ? "Read" : "Unread"}
-                </td>
-                <td>
-                  {n.isRead ? (
-                    <button
-                      className="btn btn-secondary btn-sm"
-                      onClick={() => markUnread(n.id)}
-                    >
-                      Mark Unread
-                    </button>
-                  ) : (
-                    <button
-                      className="btn btn-success btn-sm"
-                      onClick={() => markRead(n.id)}
-                    >
-                      Mark Read
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+      {notifications.length === 0 ? (
+        <p>No Notifications</p>
+      ) : (
+        notifications.map((n) => (
+          <div key={n.id} style={styles.card}>
+            <div>
+              <p>{n.message}</p>
+              <small>{n.time}</small>
+            </div>
+
+            <button
+              style={styles.deleteBtn}
+              onClick={() =>
+                dispatch({ type: "DELETE_NOTIFICATION", payload: n.id })
+              }
+            >
+              <FaTrash />
+            </button>
+          </div>
+        ))
+      )}
     </div>
   );
-}
+};
+
+const styles = {
+  card: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "10px",
+    marginBottom: "10px",
+    background: "#f8f9fa",
+    borderRadius: "8px",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+  },
+
+  deleteBtn: {
+    background: "#dc3545",
+    color: "#fff",
+    border: "none",
+    padding: "6px 10px",
+    borderRadius: "5px",
+    cursor: "pointer"
+  },
+
+  clearBtn: {
+    background: "#0d6efd",
+    color: "#fff",
+    border: "none",
+    padding: "8px 12px",
+    marginBottom: "15px",
+    borderRadius: "5px",
+    cursor: "pointer"
+  }
+};
+
+export default Notification;
