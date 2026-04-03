@@ -1,15 +1,11 @@
 import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+export default function ProtectedRoute({ children }) {
+  const user = localStorage.getItem("crmUser");
 
-  // ❌ Not logged in → go to login
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
-  // ✅ Logged in → allow access
   return children;
-};
-
-export default ProtectedRoute;
+}

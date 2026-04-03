@@ -15,6 +15,7 @@ const Leads = () => {
     name: "",
     email: "",
     phone: "",
+    company: "",   // ✅ ADDED
     assignedTo: "",
     status: "New"
   });
@@ -40,7 +41,6 @@ const Leads = () => {
         dispatch({
           type: "ADD_NOTIFICATION",
           payload: {
-            id: Date.now(),
             message: "✏ Lead Updated",
             time: new Date().toLocaleString()
           }
@@ -61,7 +61,6 @@ const Leads = () => {
         dispatch({
           type: "ADD_NOTIFICATION",
           payload: {
-            id: Date.now(),
             message: "✅ New Lead Added",
             time: new Date().toLocaleString()
           }
@@ -73,6 +72,7 @@ const Leads = () => {
       name: "",
       email: "",
       phone: "",
+      company: "",   // ✅ RESET
       assignedTo: "",
       status: "New"
     });
@@ -87,6 +87,7 @@ const Leads = () => {
       `Name: ${lead.name}\n` +
       `Email: ${lead.email}\n` +
       `Phone: ${lead.phone}\n` +
+      `Company: ${lead.company || "-"}\n` +
       `Employee: ${lead.assignedTo || "Not Assigned"}\n` +
       `Status: ${lead.status}`
     );
@@ -111,7 +112,6 @@ const Leads = () => {
         dispatch({
           type: "ADD_NOTIFICATION",
           payload: {
-            id: Date.now(),
             message: "❌ Lead Deleted",
             time: new Date().toLocaleString()
           }
@@ -132,7 +132,6 @@ const Leads = () => {
         dispatch({
           type: "ADD_NOTIFICATION",
           payload: {
-            id: Date.now(),
             message: "🔁 Lead Converted to Customer",
             time: new Date().toLocaleString()
           }
@@ -160,6 +159,8 @@ const Leads = () => {
             <input name="name" placeholder="Lead Name" value={form.name} onChange={handleChange} />
             <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
             <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
+            
+            <input name="company" placeholder="Company" value={form.company} onChange={handleChange} /> {/* ✅ ADDED */}
 
             <select name="assignedTo" value={form.assignedTo} onChange={handleChange}>
               <option value="">Assign Employee</option>
@@ -188,6 +189,7 @@ const Leads = () => {
                     name: "",
                     email: "",
                     phone: "",
+                    company: "",
                     assignedTo: "",
                     status: "New"
                   });
@@ -207,6 +209,7 @@ const Leads = () => {
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
+            <th>Company</th> {/* ✅ ADDED */}
             <th>Assigned To</th>
             <th>Status</th>
             <th>Action</th>
@@ -216,7 +219,7 @@ const Leads = () => {
         <tbody>
           {leads.length === 0 ? (
             <tr>
-              <td colSpan="6" align="center">No Leads</td>
+              <td colSpan="7" align="center">No Leads</td>
             </tr>
           ) : (
             leads.map((lead) => (
@@ -224,6 +227,7 @@ const Leads = () => {
                 <td>{lead.name}</td>
                 <td>{lead.email}</td>
                 <td>{lead.phone}</td>
+                <td>{lead.company || "-"}</td> {/* ✅ ADDED */}
                 <td>{lead.assignedTo || "-"}</td>
                 <td>{lead.status}</td>
 
@@ -236,7 +240,6 @@ const Leads = () => {
                     <FaEdit /> Edit
                   </button>
 
-                  {/* ✅ ONLY FOR QUALIFIED */}
                   {lead.status === "Qualified" && (
                     <button
                       style={styles.convertBtn}
