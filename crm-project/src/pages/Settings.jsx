@@ -16,6 +16,7 @@ export default function Setting() {
   });
 
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (storedUser) {
@@ -37,17 +38,6 @@ export default function Setting() {
       ...formData,
       [name]: type === "checkbox" ? checked : value
     });
-  };
-
-  const handlePhotoUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, photo: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const handleSave = (e) => {
@@ -98,8 +88,6 @@ export default function Setting() {
               />
             )}
 
-            <input type="file" onChange={handlePhotoUpload} />
-
             <input
               type="text"
               name="name"
@@ -131,28 +119,51 @@ export default function Setting() {
 
         {/* RIGHT SIDE */}
         <div style={styles.rightSection}>
+          
+          {/* CHANGE PASSWORD */}
           <div style={styles.card}>
             <h3>Change Password</h3>
 
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="New Password"
-              style={styles.input}
-            />
+            {!showPassword ? (
+              <button
+                type="button"
+                onClick={() => setShowPassword(true)}
+                style={styles.button}
+              >
+                Change Password
+              </button>
+            ) : (
+              <>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="New Password"
+                  style={styles.input}
+                />
 
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm Password"
-              style={styles.input}
-            />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirm Password"
+                  style={styles.input}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(false)}
+                  style={{ ...styles.button, background: "gray", marginTop: "10px" }}
+                >
+                  Cancel
+                </button>
+              </>
+            )}
           </div>
 
+          {/* PREFERENCES */}
           <div style={styles.card}>
             <h3>Preferences</h3>
 
