@@ -1,4 +1,4 @@
-customers: [
+export const customers= [
   {
     id: 101,
     name: "Rahul Sharma",
