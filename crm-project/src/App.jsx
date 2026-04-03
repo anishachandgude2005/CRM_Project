@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import MainLayout from "./layouts/MainLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Leads from "./pages/leads/Leads";
@@ -27,7 +26,6 @@ function App() {
 
         {/* 🔓 Public Route */}
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />  {/* ✅ FIXED */}
 
         {/* 🔐 Protected Layout */}
         <Route
@@ -37,11 +35,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-<<<<<<< HEAD
           {/* 📊 Pages */}
-=======
-          
->>>>>>> 7b12cd6caf90e60bd7ac1b33729edaef1f2f41e3
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leads" element={<Leads />} />
           <Route path="/customers" element={<Customers />} />
