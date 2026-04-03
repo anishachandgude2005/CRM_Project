@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { AppContext } from "../../context/AppContext";
-import { FaEdit, FaPlus } from "react-icons/fa";
+import { FaEdit, FaPlus, FaTrash, FaEye } from "react-icons/fa";
 
 export default function Employees() {
   const { state, dispatch } = useContext(AppContext);
@@ -12,14 +12,20 @@ export default function Employees() {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    role: "Employee"
+    role: "Employee",
+    active: true
   });
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setForm({
+      ...form,
+      [name]: name === "active" ? value === "true" : value
+    });
   };
 
-  // ✅ ADD / UPDATE (same logic)
+  // ADD / UPDATE
   const saveEmployee = () => {
     if (!form.name || !form.email) {
       alert("Name & Email required");
@@ -47,8 +53,7 @@ export default function Employees() {
         type: "ADD_EMPLOYEE",
         payload: {
           ...form,
-          id: Date.now(),
-          active: true
+          id: Date.now()
         }
       });
 
@@ -62,42 +67,75 @@ export default function Employees() {
       });
     }
 
-    setForm({ name: "", email: "", role: "Employee" });
+    setForm({
+      name: "",
+      email: "",
+      role: "Employee",
+      active: true
+    });
     setShowForm(false);
   };
 
-  // ✏ EDIT
+  // EDIT
   const editEmployee = (emp) => {
-    setForm(emp);
+    setForm({
+      name: emp.name,
+      email: emp.email,
+      role: emp.role,
+      active: emp.active
+    });
     setEditId(emp.id);
     setShowForm(true);
   };
 
-  // 🔁 TOGGLE
-  const toggleStatus = (emp) => {
+  // DELETE
+  const deleteEmployee = (id, name) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this employee?");
+    if (!confirmDelete) return;
+
     dispatch({
-      type: "TOGGLE_EMPLOYEE",
-      payload: emp.id
+      type: "DELETE_EMPLOYEE",
+      payload: id
     });
 
     dispatch({
       type: "ADD_NOTIFICATION",
       payload: {
         id: Date.now(),
-        message: `🔁 ${emp.name} is now ${emp.active ? "Inactive" : "Active"}`,
+        message: `🗑 Employee ${name} deleted`,
         time: new Date().toLocaleString()
       }
     });
   };
 
+  // VIEW
+  const viewEmployee = (emp) => {
+    alert(
+      `Employee Details\n\nName: ${emp.name}\nEmail: ${emp.email}\nRole: ${emp.role}\nStatus: ${
+        emp.active ? "Active" : "Inactive"
+      }`
+    );
+  };
+
   return (
     <div style={{ padding: "20px" }}>
-
       {/* HEADER */}
       <div style={styles.header}>
         <h2>Employee Management</h2>
 
-        <button style={styles.addBtn} onClick={() => setShowForm(true)}>
+        <button
+          style={styles.addBtn}
+          onClick={() => {
+            setShowForm(true);
+            setEditId(null);
+            setForm({
+              name: "",
+              email: "",
+              role: "Employee",
+              active: true
+            });
+          }}
+        >
           <FaPlus /> Add Employee
         </button>
       </div>
@@ -133,6 +171,16 @@ export default function Employees() {
               <option>Manager</option>
             </select>
 
+            {/* NEW STATUS FIELD */}
+            <select
+              name="active"
+              value={form.active.toString()}
+              onChange={handleChange}
+            >
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+
             <div style={{ marginTop: "15px" }}>
               <button style={styles.saveBtn} onClick={saveEmployee}>
                 Save
@@ -143,6 +191,12 @@ export default function Employees() {
                 onClick={() => {
                   setShowForm(false);
                   setEditId(null);
+                  setForm({
+                    name: "",
+                    email: "",
+                    role: "Employee",
+                    active: true
+                  });
                 }}
               >
                 Cancel
@@ -179,6 +233,13 @@ export default function Employees() {
 
                 <td>
                   <button
+                    style={styles.viewBtn}
+                    onClick={() => viewEmployee(emp)}
+                  >
+                    <FaEye /> View
+                  </button>
+
+                  <button
                     style={styles.editBtn}
                     onClick={() => editEmployee(emp)}
                   >
@@ -186,10 +247,10 @@ export default function Employees() {
                   </button>
 
                   <button
-                    style={emp.active ? styles.deleteBtn : styles.saveBtn}
-                    onClick={() => toggleStatus(emp)}
+                    style={styles.deleteBtn}
+                    onClick={() => deleteEmployee(emp.id, emp.name)}
                   >
-                    {emp.active ? "Deactivate" : "Activate"}
+                    <FaTrash /> Delete
                   </button>
                 </td>
               </tr>
@@ -201,7 +262,6 @@ export default function Employees() {
   );
 }
 
-// ✅ SAME STYLE AS LEADS
 const styles = {
   header: {
     display: "flex",
@@ -213,6 +273,15 @@ const styles = {
     color: "#fff",
     padding: "8px 15px",
     border: "none",
+    borderRadius: "6px",
+    cursor: "pointer"
+  },
+  viewBtn: {
+    backgroundColor: "#0d6efd",
+    color: "#fff",
+    border: "none",
+    padding: "6px 12px",
+    marginRight: "8px",
     borderRadius: "6px",
     cursor: "pointer"
   },
@@ -252,7 +321,8 @@ const styles = {
     width: "400px",
     display: "flex",
     flexDirection: "column",
-    gap: "10px"
+    gap: "10px",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
   },
   saveBtn: {
     background: "#198754",
