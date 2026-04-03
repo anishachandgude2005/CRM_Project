@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthLayout from "../components/AuthLayout";
+import AuthLayout from "./AuthLayout";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,166 +10,119 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    setError("");
+ const handleLogin = () => {
+  setError("");
 
-    // ✅ validation
-    if (!email || !password) {
-      setError("All fields required");
-      return;
-    }
+  // Validation
+  if (!email) {
+    setError("Email is required");
+    return;
+  }
 
-    // ✅ get users from localStorage
-    const users = JSON.parse(localStorage.getItem("crmUsers")) || [];
+  if (!password) {
+    setError("Password is required");
+    return;
+  }
 
-    // ✅ find user by email (case-insensitive)
-    const user = users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
-    );
+  if (password.length < 4) {
+    setError("Password must be at least 4 characters");
+    return;
+  }
 
-    // ❌ user not found
-    if (!user) {
-      setError("User not found. Please register first.");
-      return;
-    }
+  const storedUser = JSON.parse(localStorage.getItem("crmUser"));
 
-    // ❌ wrong password
-    if (user.password !== password.trim()) {
-      setError("Wrong password");
-      return;
-    }
-
-    // ❌ wrong role
-    if (user.role !== role) {
-      setError("Wrong role selected");
-      return;
-    }
-
-    // ✅ success
-    localStorage.setItem("loggedInUser", JSON.stringify(user));
+  // 🟢 First Time (No user stored)
+  if (!storedUser) {
+    const newUser = { email, password, role };
+    localStorage.setItem("crmUser", JSON.stringify(newUser));
     navigate("/dashboard");
-  };
+    return;
+  }
+
+  // 🟢 Same Email + Correct Password
+  if (storedUser.email === email && storedUser.password === password) {
+    navigate("/dashboard");
+    return;
+  }
+
+  // 🔴 Same Email + Wrong Password
+  if (storedUser.email === email && storedUser.password !== password) {
+    setError("Password is wrong");
+    return;
+  }
+
+  // 🟢 Different Email → Create New Account
+  const newUser = { email, password, role };
+  localStorage.setItem("crmUser", JSON.stringify(newUser));
+  navigate("/dashboard");
+};
 
   return (
-    <AuthLayout title="Login" subtitle="Welcome back! Please login">
-      <div style={styles.card}>
-
-        <h2 style={styles.title}>CRM Login</h2>
-        <p style={styles.subtitle}>Welcome back! Please login</p>
-
+    <div style={styles.container}>
+      <AuthLayout title="CRM Login">
         {error && <p style={styles.error}>{error}</p>}
 
-        {/* EMAIL */}
-        <div style={styles.inputBox}>
-          <input
-            type="email"
-            placeholder="Email Address"
-            onChange={(e) => setEmail(e.target.value)}
-            style={styles.input}
-          />
-        </div>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={styles.input}
+        />
 
-        {/* PASSWORD */}
-        <div style={styles.inputBox}>
-          <input
-            type="password"
-            placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
-            style={styles.input}
-          />
-        </div>
+        <input
+          type="password"
+          placeholder="Enter your password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={styles.input}
+        />
 
-        {/* ROLE */}
-        <div style={styles.inputBox}>
-          <select onChange={(e) => setRole(e.target.value)} style={styles.input}>
-            <option>Admin</option>
-            <option>Manager</option>
-            <option>Employee</option>
-          </select>
-        </div>
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          style={styles.input}
+        >
+          <option>Admin</option>
+          <option>Manager</option>
+          <option>Employee</option>
+        </select>
 
-        {/* BUTTON */}
-        <button style={styles.button} onClick={handleLogin}>
+        <button onClick={handleLogin} style={styles.button}>
           Login
         </button>
-
-        {/* FOOTER */}
-        <p style={styles.footer}>
-          Don't have an account?{" "}
-          <span style={styles.link} onClick={() => navigate("/register")}>
-            Register
-          </span>
-        </p>
-
-      </div>
-    </AuthLayout>
+      </AuthLayout>
+    </div>
   );
 }
 
 const styles = {
-  card: {
-    width: "100%",
-    maxWidth: "380px",
-    padding: "40px 30px",
-    borderRadius: "20px",
-    background: "#ffffff",
-    boxShadow: "0 25px 60px rgba(0,0,0,0.25)",
+  container: {
     textAlign: "center",
   },
-
-  title: {
-    fontSize: "28px",
-    fontWeight: "700",
-    marginBottom: "5px",
-    color: "#1f2937",
-  },
-
-  subtitle: {
-    fontSize: "14px",
-    color: "#6b7280",
-    marginBottom: "25px",
-  },
-
-  inputBox: {
-    marginBottom: "15px",
-  },
-
-  input: {
-    width: "100%",
-    padding: "13px",
-    borderRadius: "10px",
-    border: "1px solid #ddd",
-    fontSize: "14px",
-    outline: "none",
-  },
-
-  button: {
-    width: "100%",
-    padding: "13px",
-    borderRadius: "10px",
-    border: "none",
-    background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: "15px",
-    cursor: "pointer",
-    marginTop: "10px",
-  },
-
-  footer: {
-    marginTop: "18px",
-    fontSize: "14px",
-  },
-
-  link: {
-    color: "#4f46e5",
-    cursor: "pointer",
-    fontWeight: "600",
-  },
-
   error: {
     color: "red",
     marginBottom: "10px",
-    fontSize: "13px",
+    fontSize: "14px",
+  },
+  input: {
+    width: "100%",
+    padding: "12px",
+    marginBottom: "12px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    outline: "none",
+    fontSize: "14px",
+  },
+  button: {
+    width: "100%",
+    padding: "12px",
+    background: "#4f46e5",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    fontWeight: "bold",
+    fontSize: "15px",
+    cursor: "pointer",
   },
 };
