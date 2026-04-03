@@ -9,8 +9,18 @@ export default function Reports() {
   const [employee, setEmployee] = useState("");
   const [search, setSearch] = useState("");
 
-  /* ---------- FILTER LEADS ---------- */
-  const filteredLeads = state.leads.filter((lead) => {
+  // ✅ MERGE LEADS + CUSTOMERS
+  const allData = [
+    ...state.leads,
+    ...state.customers.map((c) => ({
+      ...c,
+      status: "Converted", // ✅ mark customer
+      assignedTo: "-", // optional
+    })),
+  ];
+
+  /* ---------- FILTER DATA ---------- */
+  const filteredLeads = allData.filter((lead) => {
     const leadDate = lead.createdAt
       ? new Date(lead.createdAt)
       : null;
@@ -40,6 +50,7 @@ export default function Reports() {
     Contacted: 0,
     Qualified: 0,
     Lost: 0,
+    Converted: 0, // ✅ added
   };
 
   filteredLeads.forEach((lead) => {
@@ -80,6 +91,8 @@ export default function Reports() {
         return "success";
       case "Lost":
         return "danger";
+      case "Converted":
+        return "dark"; // ✅ new color
       default:
         return "secondary";
     }
@@ -148,7 +161,7 @@ export default function Reports() {
 
         <div className="row text-center">
           {Object.entries(statusCounts).map(([status, count]) => (
-            <div key={status} className="col-md-3">
+            <div key={status} className="col-md-2">
               <div className="border rounded p-3">
                 <h6>{status}</h6>
                 <h4>{count}</h4>
@@ -193,11 +206,7 @@ export default function Reports() {
                   <td>{lead.name}</td>
                   <td>{lead.email}</td>
                   <td>
-                    <span
-                      className={`badge bg-${badgeColor(
-                        lead.status
-                      )}`}
-                    >
+                    <span className={`badge bg-${badgeColor(lead.status)}`}>
                       {lead.status}
                     </span>
                   </td>
