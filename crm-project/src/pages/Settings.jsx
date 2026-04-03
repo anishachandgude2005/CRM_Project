@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FaUser, FaEnvelope, FaLock, FaBell, FaMoon } from "react-icons/fa";
 
 export default function Setting() {
   const storedUser = JSON.parse(localStorage.getItem("crmUser"));
@@ -75,7 +76,7 @@ export default function Setting() {
 
       <form onSubmit={handleSave} style={styles.container}>
         
-        {/* LEFT SIDE */}
+        {/* PROFILE */}
         <div style={styles.leftSection}>
           <div style={styles.card}>
             <h3>Profile Information</h3>
@@ -88,39 +89,43 @@ export default function Setting() {
               />
             )}
 
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Full Name"
-              required
-              style={styles.input}
-            />
+            <div style={styles.inputGroup}>
+              <FaUser style={styles.icon} />
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Full Name"
+                required
+                style={styles.input}
+              />
+            </div>
 
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email Address"
-              required
-              style={styles.input}
-            />
+            <div style={styles.inputGroup}>
+              <FaEnvelope style={styles.icon} />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email Address"
+                required
+                style={styles.input}
+              />
+            </div>
 
             <input
               type="text"
               value={formData.role}
               disabled
-              style={{ ...styles.input, background: "#f1f1f1" }}
+              style={{ ...styles.input, background: "#f1f1f1", marginTop: "12px" }}
             />
           </div>
         </div>
 
-        {/* RIGHT SIDE */}
+        {/* PASSWORD */}
         <div style={styles.rightSection}>
-          
-          {/* CHANGE PASSWORD */}
           <div style={styles.card}>
             <h3>Change Password</h3>
 
@@ -134,23 +139,29 @@ export default function Setting() {
               </button>
             ) : (
               <>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="New Password"
-                  style={styles.input}
-                />
+                <div style={styles.inputGroup}>
+                  <FaLock style={styles.icon} />
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="New Password"
+                    style={styles.input}
+                  />
+                </div>
 
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm Password"
-                  style={styles.input}
-                />
+                <div style={styles.inputGroup}>
+                  <FaLock style={styles.icon} />
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Confirm Password"
+                    style={styles.input}
+                  />
+                </div>
 
                 <button
                   type="button"
@@ -162,43 +173,46 @@ export default function Setting() {
               </>
             )}
           </div>
+        </div>
 
-          {/* PREFERENCES */}
+        {/* PREFERENCES */}
+        <div style={styles.rightSection}>
           <div style={styles.card}>
             <h3>Preferences</h3>
 
             <label style={styles.checkbox}>
+              <FaBell /> Email Notifications
               <input
                 type="checkbox"
                 name="emailNotification"
                 checked={formData.emailNotification}
                 onChange={handleChange}
               />
-              Email Notifications
             </label>
 
             <label style={styles.checkbox}>
+              <FaBell /> SMS Notifications
               <input
                 type="checkbox"
                 name="smsNotification"
                 checked={formData.smsNotification}
                 onChange={handleChange}
               />
-              SMS Notifications
             </label>
 
             <label style={styles.checkbox}>
+              <FaMoon /> Dark Mode
               <input
                 type="checkbox"
                 name="darkMode"
                 checked={formData.darkMode}
                 onChange={handleChange}
               />
-              Enable Dark Mode
             </label>
           </div>
         </div>
 
+        {/* SAVE BUTTON */}
         <div style={styles.fullWidth}>
           <button type="submit" style={styles.button}>
             Save Changes
@@ -215,67 +229,106 @@ export default function Setting() {
 const styles = {
   wrapper: {
     padding: "40px",
-    background: "#f4f6f9",
-    minHeight: "100vh"
+    minHeight: "100vh",
+    width: "100%",
+    background: "linear-gradient(135deg, #1e3c72, #2a5298)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
   },
+
   heading: {
-    marginBottom: "20px"
+    color: "#fff",
+    marginBottom: "30px",
+    fontSize: "32px"
   },
+
   container: {
     display: "flex",
-    gap: "20px",
-    flexWrap: "wrap"
+    flexDirection: "column",   // ✅ vertical layout
+    gap: "25px",
+    width: "100%",
+    maxWidth: "900px"
   },
+
   leftSection: {
-    flex: 1,
-    minWidth: "350px"
+    width: "100%"   // ✅ full width
   },
+
   rightSection: {
-    flex: 1,
-    minWidth: "350px"
+    width: "100%"   // ✅ full width
   },
+
   card: {
-    background: "#ffffff",
+    background: "#fff",
     padding: "25px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-    marginBottom: "20px"
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    marginTop: "10px",
-    borderRadius: "6px",
-    border: "1px solid #ccc"
-  },
-  checkbox: {
-    display: "block",
-    marginTop: "10px"
-  },
-  button: {
-    padding: "12px 25px",
-    background: "#1976d2",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer"
-  },
-  fullWidth: {
-    width: "100%",
-    marginTop: "10px"
-  },
-  alert: {
+    borderRadius: "15px",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
     marginBottom: "20px",
-    padding: "12px",
-    background: "#e6f4ea",
-    color: "green",
+    width: "100%"
+  },
+
+  inputGroup: {
+    display: "flex",
+    alignItems: "center",
+    background: "#f1f3f6",
+    borderRadius: "10px",
+    padding: "10px",
+    marginTop: "12px"
+  },
+
+  icon: {
+    marginRight: "10px",
+    color: "#1976d2"
+  },
+
+  input: {
+    border: "none",
+    outline: "none",
+    background: "transparent",
+    width: "100%",
+    fontSize: "14px"
+  },
+
+  checkbox: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: "12px",
+    background: "#f9f9f9",
+    padding: "10px",
     borderRadius: "8px"
   },
+
+  button: {
+    padding: "12px 30px",
+    background: "linear-gradient(135deg, #7b5fff, #7b93fe)",
+    border: "none",
+    color: "#fff",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontSize: "16px",
+    boxShadow: "0 5px 15px rgba(0,0,0,0.2)"
+  },
+
+  fullWidth: {
+    width: "100%",
+    textAlign: "center"
+  },
+
+  alert: {
+    background: "#fff",
+    padding: "12px 20px",
+    borderRadius: "10px",
+    marginBottom: "20px",
+    color: "green"
+  },
+
   profileImage: {
-    width: "100px",
-    height: "100px",
+    width: "110px",
+    height: "110px",
     borderRadius: "50%",
-    objectFit: "cover",
-    marginBottom: "10px"
+    marginBottom: "10px",
+    border: "3px solid #1976d2"
   }
 };
