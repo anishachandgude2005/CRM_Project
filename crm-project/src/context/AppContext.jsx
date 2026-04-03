@@ -56,7 +56,7 @@ function reducer(state, action) {
         name: lead.name,
         email: lead.email,
         phone: lead.phone,
-        company: "",
+        company: lead.company,
         status: "Active",
         leadId: lead.id
       };
