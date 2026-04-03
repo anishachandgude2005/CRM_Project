@@ -1,5 +1,15 @@
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
+import {
+  FaTachometerAlt,
+  FaUserTie,
+  FaUsers,
+  FaTasks,
+  FaChartBar,
+  FaUser,
+  FaBell,
+  FaCog
+} from "react-icons/fa";
 
 export default function Sidebar() {
   const user = JSON.parse(localStorage.getItem("crmUser"));
@@ -9,19 +19,20 @@ export default function Sidebar() {
       <h3 className="logo">CRM System</h3>
 
       <nav>
+
         <NavLink to="/dashboard" className="nav-link">
-          Dashboard
+          <FaTachometerAlt /> Dashboard
         </NavLink>
 
         {/* Admin + Manager */}
         {(user?.role === "Admin" || user?.role === "Manager") && (
           <>
             <NavLink to="/leads" className="nav-link">
-              Leads
+              <FaUserTie /> Leads
             </NavLink>
 
             <NavLink to="/customers" className="nav-link">
-              Customers
+              <FaUsers /> Customers
             </NavLink>
           </>
         )}
@@ -29,38 +40,38 @@ export default function Sidebar() {
         {/* Admin Only */}
         {user?.role === "Admin" && (
           <NavLink to="/employees" className="nav-link">
-            Employees
+            <FaUsers /> Employees
           </NavLink>
         )}
 
         {/* All Roles */}
         <NavLink to="/tasks" className="nav-link">
-          Tasks
+          <FaTasks /> Tasks
         </NavLink>
 
         {/* Admin + Manager */}
         {(user?.role === "Admin" || user?.role === "Manager") && (
           <NavLink to="/reports" className="nav-link">
-            Reports
+            <FaChartBar /> Reports
           </NavLink>
         )}
 
         {(user?.role === "Admin" || user?.role === "Manager") && (
-        <NavLink to="/settings" className="nav-link">
-          Settings
-        </NavLink>
+          <NavLink to="/settings" className="nav-link">
+            <FaCog /> Settings
+          </NavLink>
         )}
 
-        
         {(user?.role === "Admin" || user?.role === "Manager") && (
-        <NavLink to="/notification" className="nav-link">
-          Notification
-        </NavLink>
+          <NavLink to="/notification" className="nav-link">
+            <FaBell /> Notifications
+          </NavLink>
         )}
 
         <NavLink to="/profile" className="nav-link">
-          My Profile
+          <FaUser /> My Profile
         </NavLink>
+
       </nav>
     </aside>
   );
