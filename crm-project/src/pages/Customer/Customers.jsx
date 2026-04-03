@@ -7,7 +7,7 @@ const Customers = () => {
 
   const currentUser = state.currentUser;
 
-  // 🔥 Role Based Filter
+  //  Role Based Filter
   const customers =
     currentUser?.role === "Lead"
       ? state.customers.filter((c) => c.leadId === currentUser.id)

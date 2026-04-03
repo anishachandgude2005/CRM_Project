@@ -23,7 +23,7 @@ const Leads = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ✅ SAVE LEAD (FIXED)
+  // ✅ SAVE LEAD
   const saveLead = () => {
     if (!form.name || !form.email) {
       alert("Name & Email required");
@@ -36,7 +36,6 @@ const Leads = () => {
         payload: { ...form, id: editId }
       });
 
-      // 🔔 FIX: delay
       setTimeout(() => {
         dispatch({
           type: "ADD_NOTIFICATION",
@@ -58,7 +57,6 @@ const Leads = () => {
         payload: newLead
       });
 
-      // 🔔 FIX: delay
       setTimeout(() => {
         dispatch({
           type: "ADD_NOTIFICATION",
@@ -109,7 +107,6 @@ const Leads = () => {
         payload: id
       });
 
-      // 🔔 FIX
       setTimeout(() => {
         dispatch({
           type: "ADD_NOTIFICATION",
@@ -131,7 +128,6 @@ const Leads = () => {
         payload: lead
       });
 
-      // 🔔 FIX
       setTimeout(() => {
         dispatch({
           type: "ADD_NOTIFICATION",
@@ -240,9 +236,15 @@ const Leads = () => {
                     <FaEdit /> Edit
                   </button>
 
-                  <button style={styles.convertBtn} onClick={() => convertToCustomer(lead)}>
-                    <FaExchangeAlt /> Convert
-                  </button>
+                  {/* ✅ ONLY FOR QUALIFIED */}
+                  {lead.status === "Qualified" && (
+                    <button
+                      style={styles.convertBtn}
+                      onClick={() => convertToCustomer(lead)}
+                    >
+                      <FaExchangeAlt /> Convert
+                    </button>
+                  )}
 
                   <button style={styles.deleteBtn} onClick={() => deleteLead(lead.id)}>
                     <FaTrash /> Delete
