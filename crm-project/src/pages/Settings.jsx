@@ -211,15 +211,8 @@ export default function Setting() {
               />
             </label>
 
-            <label style={styles.checkbox}>
-              <FaMoon /> Dark Mode
-              <input
-                type="checkbox"
-                name="darkMode"
-                checked={formData.darkMode}
-                onChange={handleChange}
-              />
-            </label>
+           
+           
           </div>
         </div>
 
