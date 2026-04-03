@@ -163,13 +163,24 @@ export default function Setting() {
                   />
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(false)}
-                  style={{ ...styles.button, background: "gray", marginTop: "10px" }}
-                >
-                  Cancel
-                </button>
+                <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+  
+  <button
+    type="submit"
+    style={{ ...styles.button, background: "#1976d2" }}   // 🔵 Blue Save
+  >
+    Save
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setShowPassword(false)}
+    style={{ ...styles.button, background: "#1976d2" }}
+  >
+    Cancel
+  </button>
+
+</div>
               </>
             )}
           </div>
@@ -231,14 +242,14 @@ const styles = {
     padding: "40px",
     minHeight: "100vh",
     width: "100%",
-    background: "linear-gradient(135deg, #1e3c72, #2a5298)",
+    background: "linear-gradient(135deg, #eff0f2, #f2f2f3)",
     display: "flex",
     flexDirection: "column",
     alignItems: "center"
   },
 
   heading: {
-    color: "#fff",
+    color: "#1f0d0d",
     marginBottom: "30px",
     fontSize: "32px"
   },
@@ -302,7 +313,7 @@ const styles = {
 
   button: {
     padding: "12px 30px",
-    background: "linear-gradient(135deg, #7b5fff, #7b93fe)",
+    background: "linear-gradient(135deg, #1976d2, #1976d2)",
     border: "none",
     color: "#fff",
     borderRadius: "10px",
