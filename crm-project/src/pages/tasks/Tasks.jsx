@@ -9,7 +9,8 @@ import {
   FaTasks,
   FaClock,
   FaCheckCircle,
-  FaExclamationTriangle
+  FaExclamationTriangle,
+  FaFileInvoice
 } from "react-icons/fa";
 
 export default function Task() {
@@ -27,12 +28,38 @@ export default function Task() {
     assignedTo: "",
     dueDate: "",
     priority: "Medium",
-    completed: false
+    completed: false,
+    projectValue: "",
+    advancePaid: "",
+    pendingAmount: "",
+    paymentStatus: "Pending"
   });
 
+  // HANDLE INPUT CHANGE
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+
+    let updatedForm = { ...form, [name]: value };
+
+    // Auto calculate Pending Amount
+    if (name === "projectValue" || name === "advancePaid") {
+      const total = Number(name === "projectValue" ? value : updatedForm.projectValue || 0);
+      const advance = Number(name === "advancePaid" ? value : updatedForm.advancePaid || 0);
+
+      const pending = total - advance;
+
+      updatedForm.pendingAmount = pending >= 0 ? pending : 0;
+
+      if (advance <= 0) {
+        updatedForm.paymentStatus = "Pending";
+      } else if (advance < total) {
+        updatedForm.paymentStatus = "Partial";
+      } else {
+        updatedForm.paymentStatus = "Paid";
+      }
+    }
+
+    setForm(updatedForm);
   };
 
   const resetForm = () => {
@@ -43,7 +70,11 @@ export default function Task() {
       assignedTo: "",
       dueDate: "",
       priority: "Medium",
-      completed: false
+      completed: false,
+      projectValue: "",
+      advancePaid: "",
+      pendingAmount: "",
+      paymentStatus: "Pending"
     });
     setEditId(null);
   };
@@ -55,11 +86,18 @@ export default function Task() {
       return;
     }
 
+    const finalTask = {
+      ...form,
+      projectValue: Number(form.projectValue || 0),
+      advancePaid: Number(form.advancePaid || 0),
+      pendingAmount: Number(form.pendingAmount || 0)
+    };
+
     if (editId) {
       dispatch({
         type: "UPDATE_TASK",
         payload: {
-          ...form,
+          ...finalTask,
           id: editId
         }
       });
@@ -76,7 +114,7 @@ export default function Task() {
       dispatch({
         type: "ADD_TASK",
         payload: {
-          ...form,
+          ...finalTask,
           id: Date.now()
         }
       });
@@ -103,7 +141,11 @@ export default function Task() {
       assignedTo: task.assignedTo || "",
       dueDate: task.dueDate,
       priority: task.priority || "Medium",
-      completed: task.completed || false
+      completed: task.completed || false,
+      projectValue: task.projectValue || "",
+      advancePaid: task.advancePaid || "",
+      pendingAmount: task.pendingAmount || "",
+      paymentStatus: task.paymentStatus || "Pending"
     });
     setEditId(task.id);
   };
@@ -148,6 +190,91 @@ export default function Task() {
         time: new Date().toLocaleString()
       }
     });
+  };
+
+  // DOWNLOAD INVOICE AS PDF (Browser Print PDF)
+  const downloadInvoice = (task) => {
+    if (!task.completed) {
+      alert("Invoice can only be downloaded when task is completed.");
+      return;
+    }
+
+    const invoiceWindow = window.open("", "_blank");
+
+    invoiceWindow.document.write(`
+      <html>
+        <head>
+          <title>Invoice - ${task.title}</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 30px;
+              color: #333;
+            }
+            .invoice-box {
+              max-width: 800px;
+              margin: auto;
+              border: 1px solid #eee;
+              padding: 30px;
+              box-shadow: 0 0 10px rgba(0,0,0,0.15);
+            }
+            h1, h2, h3 {
+              margin: 0 0 15px;
+            }
+            .row {
+              margin-bottom: 10px;
+            }
+            .label {
+              font-weight: bold;
+            }
+            .total-box {
+              margin-top: 20px;
+              padding: 15px;
+              background: #f8f9fa;
+              border-radius: 8px;
+            }
+            button {
+              margin-top: 25px;
+              padding: 10px 20px;
+              background: #0d6efd;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+            }
+            @media print {
+              button {
+                display: none;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-box">
+            <h1>CRM Task Invoice</h1>
+            <h3>${task.title}</h3>
+
+            <div class="row"><span class="label">Description:</span> ${task.description || "N/A"}</div>
+            <div class="row"><span class="label">Assigned To:</span> ${task.assignedTo || "Not Assigned"}</div>
+            <div class="row"><span class="label">Assigned By:</span> ${task.assignedBy}</div>
+            <div class="row"><span class="label">Due Date:</span> ${task.dueDate}</div>
+            <div class="row"><span class="label">Priority:</span> ${task.priority}</div>
+            <div class="row"><span class="label">Status:</span> ${task.completed ? "Completed" : "Pending"}</div>
+
+            <div class="total-box">
+              <div class="row"><span class="label">Project Value:</span> ₹${task.projectValue || 0}</div>
+              <div class="row"><span class="label">Advance Paid:</span> ₹${task.advancePaid || 0}</div>
+              <div class="row"><span class="label">Pending Amount:</span> ₹${task.pendingAmount || 0}</div>
+              <div class="row"><span class="label">Payment Status:</span> ${task.paymentStatus || "Pending"}</div>
+            </div>
+
+            <button onclick="window.print()">Download / Save as PDF</button>
+          </div>
+        </body>
+      </html>
+    `);
+
+    invoiceWindow.document.close();
   };
 
   // SEARCH FILTER
@@ -305,6 +432,49 @@ export default function Task() {
           </select>
         </div>
 
+        {/* PAYMENT SECTION */}
+        <div style={styles.grid2}>
+          <input
+            style={styles.input}
+            type="number"
+            name="projectValue"
+            placeholder="Project Value"
+            value={form.projectValue}
+            onChange={handleChange}
+          />
+
+          <input
+            style={styles.input}
+            type="number"
+            name="advancePaid"
+            placeholder="Advance Paid"
+            value={form.advancePaid}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div style={styles.grid2}>
+          <input
+            style={styles.input}
+            type="number"
+            name="pendingAmount"
+            placeholder="Pending Amount"
+            value={form.pendingAmount}
+            readOnly
+          />
+
+          <select
+            style={styles.input}
+            name="paymentStatus"
+            value={form.paymentStatus}
+            onChange={handleChange}
+          >
+            <option>Pending</option>
+            <option>Partial</option>
+            <option>Paid</option>
+          </select>
+        </div>
+
         <div style={{ marginTop: "15px" }}>
           <button style={styles.createBtn} onClick={saveTask}>
             <FaPlus style={{ marginRight: "8px" }} />
@@ -347,20 +517,17 @@ export default function Task() {
                 </div>
 
                 <p style={styles.taskText}>
-                  <strong>Description:</strong>{" "}
-                  {task.description || "No description"}
+                  <strong>Description:</strong> {task.description || "No description"}
                 </p>
                 <p style={styles.taskText}>
                   <strong>Assigned By:</strong> {task.assignedBy}
                 </p>
                 <p style={styles.taskText}>
-                  <strong>Assigned To:</strong>{" "}
-                  {task.assignedTo || "Not Assigned"}
+                  <strong>Assigned To:</strong> {task.assignedTo || "Not Assigned"}
                 </p>
                 <p style={styles.taskText}>
                   <strong>Due:</strong> {task.dueDate}
                 </p>
-
                 <p style={styles.taskText}>
                   <strong>Priority:</strong>{" "}
                   <span
@@ -372,6 +539,11 @@ export default function Task() {
                     {task.priority}
                   </span>
                 </p>
+
+                <p style={styles.taskText}><strong>Project Value:</strong> ₹{task.projectValue || 0}</p>
+                <p style={styles.taskText}><strong>Advance Paid:</strong> ₹{task.advancePaid || 0}</p>
+                <p style={styles.taskText}><strong>Pending Amount:</strong> ₹{task.pendingAmount || 0}</p>
+                <p style={styles.taskText}><strong>Payment Status:</strong> {task.paymentStatus || "Pending"}</p>
               </div>
 
               <div style={styles.taskActions}>
@@ -393,6 +565,14 @@ export default function Task() {
                 >
                   <FaEdit style={{ marginRight: "6px" }} />
                   Edit
+                </button>
+
+                <button
+                  style={styles.invoiceBtn}
+                  onClick={() => downloadInvoice(task)}
+                >
+                  <FaFileInvoice style={{ marginRight: "6px" }} />
+                  Invoice
                 </button>
 
                 <button
@@ -647,6 +827,17 @@ const styles = {
 
   editBtn: {
     backgroundColor: "#0d6efd",
+    color: "#fff",
+    border: "none",
+    padding: "10px 14px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontSize: "15px",
+    fontWeight: "600"
+  },
+
+  invoiceBtn: {
+    backgroundColor: "#6f42c1",
     color: "#fff",
     border: "none",
     padding: "10px 14px",
