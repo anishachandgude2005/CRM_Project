@@ -15,9 +15,10 @@ const Leads = () => {
     name: "",
     email: "",
     phone: "",
-    company: "",   // ✅ ADDED
+    company: "",
     assignedTo: "",
-    status: "New"
+    status: "New",
+    createdBy: "Admin" // ✅ Added
   });
 
   const handleChange = (e) => {
@@ -47,10 +48,27 @@ const Leads = () => {
         });
       }, 100);
 
+      // ✅ Add task if status is Qualified
+      if (form.status === "Qualified") {
+        dispatch({
+          type: "ADD_TASK",
+          payload: {
+            id: Date.now(),
+            title: `Follow-up: ${form.name}`,
+            description: `Lead ${form.name} is qualified. Follow-up required.`,
+            assignedBy: form.createdBy || "Admin",
+            assignedTo: form.assignedTo || "",
+            dueDate: new Date().toISOString().split("T")[0],
+            priority: "Medium",
+            completed: false
+          }
+        });
+      }
+
       setEditId(null);
 
     } else {
-      const newLead = { ...form, id: Date.now() };
+      const newLead = { ...form, id: Date.now(), createdBy: form.createdBy || "Admin" };
 
       dispatch({
         type: "ADD_LEAD",
@@ -66,15 +84,33 @@ const Leads = () => {
           }
         });
       }, 100);
+
+      // ✅ Add task if status is Qualified
+      if (newLead.status === "Qualified") {
+        dispatch({
+          type: "ADD_TASK",
+          payload: {
+            id: Date.now(),
+            title: `Follow-up: ${newLead.name}`,
+            description: `Lead ${newLead.name} is qualified. Follow-up required.`,
+            assignedBy: newLead.createdBy || "Admin",
+            assignedTo: newLead.assignedTo || "",
+            dueDate: new Date().toISOString().split("T")[0],
+            priority: "Medium",
+            completed: false
+          }
+        });
+      }
     }
 
     setForm({
       name: "",
       email: "",
       phone: "",
-      company: "",   // ✅ RESET
+      company: "",
       assignedTo: "",
-      status: "New"
+      status: "New",
+      createdBy: "Admin"
     });
 
     setShowForm(false);
@@ -84,12 +120,13 @@ const Leads = () => {
   const viewLead = (lead) => {
     alert(
       `Lead Details\n\n` +
+      `Created By: ${lead.createdBy || "Admin"}\n` +
+      `Assigned To: ${lead.assignedTo || "Not Assigned"}\n` +
+      `Status: ${lead.status}\n` +
       `Name: ${lead.name}\n` +
       `Email: ${lead.email}\n` +
       `Phone: ${lead.phone}\n` +
-      `Company: ${lead.company || "-"}\n` +
-      `Employee: ${lead.assignedTo || "Not Assigned"}\n` +
-      `Status: ${lead.status}`
+      `Company: ${lead.company || "-"}`
     );
   };
 
@@ -156,18 +193,11 @@ const Leads = () => {
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h3>{editId ? "Update Lead" : "Add New Lead"}</h3>
 
-            <input name="name" placeholder="Lead Name" value={form.name} onChange={handleChange} />
-            <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
-            <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
-            
-            <input name="company" placeholder="Company" value={form.company} onChange={handleChange} /> {/* ✅ ADDED */}
-
+            <input name="createdBy" placeholder="Created By" value={form.createdBy} onChange={handleChange} />
             <select name="assignedTo" value={form.assignedTo} onChange={handleChange}>
               <option value="">Assign Employee</option>
               {employees.map((emp) => (
-                <option key={emp.id} value={emp.name}>
-                  {emp.name}
-                </option>
+                <option key={emp.id} value={emp.name}>{emp.name}</option>
               ))}
             </select>
 
@@ -178,9 +208,13 @@ const Leads = () => {
               <option>Lost</option>
             </select>
 
+            <input name="name" placeholder="Lead Name" value={form.name} onChange={handleChange} />
+            <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
+            <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
+            <input name="company" placeholder="Company" value={form.company} onChange={handleChange} />
+
             <div style={{ marginTop: "15px" }}>
               <button style={styles.saveBtn} onClick={saveLead}>Save</button>
-
               <button
                 style={styles.cancelBtn}
                 onClick={() => {
@@ -191,7 +225,8 @@ const Leads = () => {
                     phone: "",
                     company: "",
                     assignedTo: "",
-                    status: "New"
+                    status: "New",
+                    createdBy: "Admin"
                   });
                 }}
               >
@@ -206,12 +241,13 @@ const Leads = () => {
       <table border="1" width="100%" cellPadding="10">
         <thead>
           <tr>
+            <th>Created By</th> {/* ✅ First */}
+            <th>Assigned To</th> {/* ✅ Second */}
+            <th>Status</th>
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
-            <th>Company</th> {/* ✅ ADDED */}
-            <th>Assigned To</th>
-            <th>Status</th>
+            <th>Company</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -219,27 +255,25 @@ const Leads = () => {
         <tbody>
           {leads.length === 0 ? (
             <tr>
-              <td colSpan="7" align="center">No Leads</td>
+              <td colSpan="8" align="center">No Leads</td>
             </tr>
           ) : (
             leads.map((lead) => (
               <tr key={lead.id}>
+                <td>{lead.createdBy || "Admin"}</td>
+                <td>{lead.assignedTo || "-"}</td>
+                <td>{lead.status}</td>
                 <td>{lead.name}</td>
                 <td>{lead.email}</td>
                 <td>{lead.phone}</td>
-                <td>{lead.company || "-"}</td> {/* ✅ ADDED */}
-                <td>{lead.assignedTo || "-"}</td>
-                <td>{lead.status}</td>
-
+                <td>{lead.company || "-"}</td>
                 <td>
                   <button style={styles.viewBtn} onClick={() => viewLead(lead)}>
                     <FaEye /> View
                   </button>
-
                   <button style={styles.editBtn} onClick={() => editLead(lead)}>
                     <FaEdit /> Edit
                   </button>
-
                   {lead.status === "Qualified" && (
                     <button
                       style={styles.convertBtn}
@@ -248,7 +282,6 @@ const Leads = () => {
                       <FaExchangeAlt /> Convert
                     </button>
                   )}
-
                   <button style={styles.deleteBtn} onClick={() => deleteLead(lead.id)}>
                     <FaTrash /> Delete
                   </button>
