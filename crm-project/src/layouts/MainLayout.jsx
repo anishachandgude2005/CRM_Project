@@ -1,5 +1,6 @@
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer"; // ✅ ADD THIS
 import { Outlet } from "react-router-dom";
 import "./MainLayout.css";
 
@@ -14,6 +15,9 @@ export default function MainLayout() {
         <div className="page-content">
           <Outlet />
         </div>
+
+        {/* ✅ FOOTER ADDED HERE */}
+        <Footer />
       </div>
     </div>
   );
