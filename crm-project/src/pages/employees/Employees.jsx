@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { AppContext } from "../../context/AppContext";
-import { FaEdit, FaPlus, FaTrash, FaEye } from "react-icons/fa";
+import { FaEdit, FaPlus, FaTrash, FaSearch } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 export default function Employees() {
   const { state, dispatch } = useContext(AppContext);
@@ -8,6 +9,9 @@ export default function Employees() {
 
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
+  
+  // Search state (only for second table)
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -16,19 +20,96 @@ export default function Employees() {
     active: true
   });
 
+  const [errors, setErrors] = useState({
+    name: "",
+    email: ""
+  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setForm({
-      ...form,
-      [name]: name === "active" ? value === "true" : value
-    });
+    
+    // Name validation - only allow letters and spaces
+    if (name === "name") {
+      const onlyLettersAndSpaces = /^[A-Za-z\s]*$/;
+      if (onlyLettersAndSpaces.test(value)) {
+        setForm({
+          ...form,
+          [name]: value
+        });
+        setErrors({ ...errors, [name]: "" });
+      }
+    } else if (name === "active") {
+      setForm({
+        ...form,
+        [name]: value === "true"
+      });
+    } else {
+      setForm({
+        ...form,
+        [name]: value
+      });
+      if (name === "email") {
+        setErrors({ ...errors, [name]: "" });
+      }
+    }
   };
 
-  // ADD / UPDATE
+  // Validation function
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { name: "", email: "" };
+
+    // Name validation - only letters and spaces, required
+    if (!form.name.trim()) {
+      newErrors.name = "Name is required";
+      isValid = false;
+    } else if (form.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters";
+      isValid = false;
+    } else if (!/^[A-Za-z\s]+$/.test(form.name.trim())) {
+      newErrors.name = "Name can only contain letters and spaces (no numbers or special characters)";
+      isValid = false;
+    }
+
+    // Email validation
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(form.email)) {
+        newErrors.email = "Please enter a valid email address";
+        isValid = false;
+      }
+    }
+
+    // Check if email already exists (for new employees only)
+    if (!editId) {
+      const emailExists = employees.some(
+        employee => employee.email.toLowerCase() === form.email.toLowerCase()
+      );
+      if (emailExists) {
+        newErrors.email = "Email already exists in employees";
+        isValid = false;
+      }
+    } else {
+      // For edit, check if email exists for other employees
+      const emailExists = employees.some(
+        employee => employee.id !== editId && employee.email.toLowerCase() === form.email.toLowerCase()
+      );
+      if (emailExists) {
+        newErrors.email = "Email already exists in employees";
+        isValid = false;
+      }
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  // ADD / UPDATE with validation
   const saveEmployee = () => {
-    if (!form.name || !form.email) {
-      alert("Name & Email required");
+    if (!validateForm()) {
       return;
     }
 
@@ -38,14 +119,16 @@ export default function Employees() {
         payload: { ...form, id: editId }
       });
 
-      dispatch({
-        type: "ADD_NOTIFICATION",
-        payload: {
-          id: Date.now(),
-          message: "✏ Employee Updated",
-          time: new Date().toLocaleString()
-        }
-      });
+      setTimeout(() => {
+        dispatch({
+          type: "ADD_NOTIFICATION",
+          payload: {
+            id: Date.now(),
+            message: "✏ Employee Updated",
+            time: new Date().toLocaleString()
+          }
+        });
+      }, 100);
 
       setEditId(null);
     } else {
@@ -57,14 +140,16 @@ export default function Employees() {
         }
       });
 
-      dispatch({
-        type: "ADD_NOTIFICATION",
-        payload: {
-          id: Date.now(),
-          message: "✅ New Employee Added",
-          time: new Date().toLocaleString()
-        }
-      });
+      setTimeout(() => {
+        dispatch({
+          type: "ADD_NOTIFICATION",
+          payload: {
+            id: Date.now(),
+            message: "✅ New Employee Added",
+            time: new Date().toLocaleString()
+          }
+        });
+      }, 100);
     }
 
     setForm({
@@ -86,35 +171,73 @@ export default function Employees() {
     });
     setEditId(emp.id);
     setShowForm(true);
+    setErrors({ name: "", email: "" });
   };
 
-  // DELETE
-  const deleteEmployee = (id, name) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this employee?");
-    if (!confirmDelete) return;
+  // DELETE with confirmation
+  const deleteEmployee = (id) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "Delete this employee?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#dc3545",
+    cancelButtonColor: "#6c757d",
+    confirmButtonText: "Yes, delete",
+    cancelButtonText: "Cancel"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      dispatch({
+        type: "DELETE_EMPLOYEE",
+        payload: id
+      });
 
-    dispatch({
-      type: "DELETE_EMPLOYEE",
-      payload: id
-    });
+      Swal.fire({
+        title: "Deleted!",
+        text: "Employee removed successfully.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false
+      });
+    }
+  });
+};
 
-    dispatch({
-      type: "ADD_NOTIFICATION",
-      payload: {
-        id: Date.now(),
-        message: `🗑 Employee ${name} deleted`,
-        time: new Date().toLocaleString()
-      }
+  // Search function for SECOND TABLE only
+  const getSearchedEmployees = () => {
+    if (!searchTerm.trim()) {
+      return employees;
+    }
+
+    const searchLower = searchTerm.toLowerCase().trim();
+    
+    return employees.filter(employee => {
+      return (
+        employee.name.toLowerCase().includes(searchLower) ||
+        employee.email.toLowerCase().includes(searchLower) ||
+        employee.role.toLowerCase().includes(searchLower) ||
+        (employee.active ? "active" : "inactive").includes(searchLower)
+      );
     });
   };
 
-  // VIEW
-  const viewEmployee = (emp) => {
-    alert(
-      `Employee Details\n\nName: ${emp.name}\nEmail: ${emp.email}\nRole: ${emp.role}\nStatus: ${
-        emp.active ? "Active" : "Inactive"
-      }`
-    );
+  const searchedEmployees = getSearchedEmployees();
+
+  // Get status style
+  const getStatusStyle = (active) => {
+    const baseStyle = {
+      padding: "4px 8px",
+      borderRadius: "4px",
+      fontSize: "12px",
+      fontWeight: "bold",
+      display: "inline-block"
+    };
+    
+    if (active) {
+      return { ...baseStyle, backgroundColor: "#e8f5e9", color: "#388e3c" };
+    } else {
+      return { ...baseStyle, backgroundColor: "#ffebee", color: "#d32f2f" };
+    }
   };
 
   return (
@@ -128,6 +251,7 @@ export default function Employees() {
           onClick={() => {
             setShowForm(true);
             setEditId(null);
+            setErrors({ name: "", email: "" });
             setForm({
               name: "",
               email: "",
@@ -146,19 +270,27 @@ export default function Employees() {
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h3>{editId ? "Update Employee" : "Add New Employee"}</h3>
 
-            <input
-              name="name"
-              placeholder="Employee Name"
-              value={form.name}
-              onChange={handleChange}
-            />
+            <div>
+              <input
+                name="name"
+                placeholder="Employee Name * (Letters only)"
+                value={form.name}
+                onChange={handleChange}
+                style={errors.name ? styles.errorInput : {}}
+              />
+              {errors.name && <div style={styles.errorText}>{errors.name}</div>}
+            </div>
 
-            <input
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-            />
+            <div>
+              <input
+                name="email"
+                placeholder="Email *"
+                value={form.email}
+                onChange={handleChange}
+                style={errors.email ? styles.errorInput : {}}
+              />
+              {errors.email && <div style={styles.errorText}>{errors.email}</div>}
+            </div>
 
             <select
               name="role"
@@ -171,7 +303,6 @@ export default function Employees() {
               <option>Manager</option>
             </select>
 
-            {/* NEW STATUS FIELD */}
             <select
               name="active"
               value={form.active.toString()}
@@ -191,6 +322,7 @@ export default function Employees() {
                 onClick={() => {
                   setShowForm(false);
                   setEditId(null);
+                  setErrors({ name: "", email: "" });
                   setForm({
                     name: "",
                     email: "",
@@ -206,58 +338,121 @@ export default function Employees() {
         </div>
       )}
 
-      {/* TABLE */}
-      <table border="1" width="100%" cellPadding="10">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {employees.length === 0 ? (
-            <tr>
-              <td colSpan="5" align="center">No Employees</td>
+      {/* FIRST TABLE - Shows ALL employees with Actions */}
+      <div style={styles.tableContainer}>
+        <table border="1" width="100%" cellPadding="10" style={styles.table}>
+          <thead>
+            <tr style={styles.tableHeader}>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ) : (
-            employees.map((emp) => (
-              <tr key={emp.id}>
-                <td>{emp.name}</td>
-                <td>{emp.email}</td>
-                <td>{emp.role}</td>
-                <td>{emp.active ? "Active" : "Inactive"}</td>
+          </thead>
 
-                <td>
-                  <button
-                    style={styles.viewBtn}
-                    onClick={() => viewEmployee(emp)}
-                  >
-                    <FaEye /> View
-                  </button>
-
-                  <button
-                    style={styles.editBtn}
-                    onClick={() => editEmployee(emp)}
-                  >
-                    <FaEdit /> Edit
-                  </button>
-
-                  <button
-                    style={styles.deleteBtn}
-                    onClick={() => deleteEmployee(emp.id, emp.name)}
-                  >
-                    <FaTrash /> Delete
-                  </button>
+          <tbody>
+            {employees.length === 0 ? (
+              <tr>
+                <td colSpan="5" align="center" style={styles.noData}>
+                  No employees available. Click 'Add Employee' to create one.
                 </td>
               </tr>
-            ))
+            ) : (
+              employees.map((emp) => (
+                <tr key={emp.id}>
+                  <td>{emp.name}</td>
+                  <td>{emp.email}</td>
+                  <td>{emp.role}</td>
+                  <td>
+                    <span style={getStatusStyle(emp.active)}>
+                      {emp.active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td style={styles.actionButtons}>
+                    <button 
+                      style={styles.editBtn} 
+                      onClick={() => editEmployee(emp)}
+                      title="Edit Employee"
+                    >
+                      <FaEdit />
+                    </button>
+                    
+                    <button 
+                      style={styles.deleteBtn} 
+                      onClick={() => deleteEmployee(emp.id, emp.name)}
+                      title="Delete Employee"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* SEARCH BAR - Controls the second table only */}
+      <div style={styles.searchContainer}>
+        <div style={styles.searchBox}>
+          <FaSearch style={styles.searchIcon} />
+          <input
+            type="text"
+            placeholder="🔍 Search employees..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={styles.searchInput}
+          />
+          {searchTerm && (
+            <button
+              style={styles.clearSearch}
+              onClick={() => setSearchTerm("")}
+            >
+              ✕
+            </button>
           )}
-        </tbody>
-      </table>
+        </div>
+      </div>
+
+      {/* SECOND TABLE - Shows search results WITHOUT Actions column */}
+      <div style={styles.tableContainer}>
+        <table border="1" width="100%" cellPadding="10" style={styles.table}>
+          <thead>
+            <tr style={styles.tableHeader}>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {searchedEmployees.length === 0 ? (
+              <tr>
+                <td colSpan="4" align="center" style={styles.noData}>
+                  {searchTerm 
+                    ? `No employees found matching "${searchTerm}"` 
+                    : "No employees available"}
+                </td>
+              </tr>
+            ) : (
+              searchedEmployees.map((emp) => (
+                <tr key={emp.id}>
+                  <td>{emp.name}</td>
+                  <td>{emp.email}</td>
+                  <td>{emp.role}</td>
+                  <td>
+                    <span style={getStatusStyle(emp.active)}>
+                      {emp.active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -268,40 +463,89 @@ const styles = {
     justifyContent: "space-between",
     marginBottom: "20px"
   },
+  
   addBtn: {
     background: "#0d6efd",
     color: "#fff",
     padding: "8px 15px",
     border: "none",
     borderRadius: "6px",
-    cursor: "pointer"
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px"
   },
-  viewBtn: {
-    backgroundColor: "#0d6efd",
-    color: "#fff",
+  
+  tableContainer: {
+    marginBottom: "30px",
+    overflowX: "auto"
+  },
+  
+  searchContainer: {
+    marginBottom: "20px",
+    width: "100%"
+  },
+  
+  searchBox: {
+    display: "flex",
+    alignItems: "center",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    padding: "8px 12px",
+    backgroundColor: "#fff",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
+  },
+  
+  searchIcon: {
+    color: "#999",
+    marginRight: "10px"
+  },
+  
+  searchInput: {
+    flex: 1,
     border: "none",
-    padding: "6px 12px",
-    marginRight: "8px",
-    borderRadius: "6px",
-    cursor: "pointer"
+    outline: "none",
+    fontSize: "14px",
+    padding: "8px 0"
   },
+  
+  clearSearch: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "16px",
+    color: "#999",
+    padding: "0 8px",
+    borderRadius: "4px"
+  },
+  
   editBtn: {
     backgroundColor: "#198754",
     color: "#fff",
     border: "none",
-    padding: "6px 12px",
-    marginRight: "8px",
-    borderRadius: "6px",
-    cursor: "pointer"
+    padding: "6px 10px",
+    marginRight: "5px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "14px",
+    width: "32px"
   },
+  
   deleteBtn: {
     backgroundColor: "#dc3545",
     color: "#fff",
     border: "none",
-    padding: "6px 12px",
-    borderRadius: "6px",
-    cursor: "pointer"
+    padding: "6px 10px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "14px",
+    width: "32px"
   },
+  
+  actionButtons: {
+    whiteSpace: "nowrap"
+  },
+  
   overlay: {
     position: "fixed",
     top: 0,
@@ -314,6 +558,7 @@ const styles = {
     alignItems: "center",
     zIndex: 1000
   },
+  
   modal: {
     background: "#fff",
     padding: "25px",
@@ -324,6 +569,7 @@ const styles = {
     gap: "10px",
     boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
   },
+  
   saveBtn: {
     background: "#198754",
     color: "#fff",
@@ -333,6 +579,7 @@ const styles = {
     borderRadius: "5px",
     cursor: "pointer"
   },
+  
   cancelBtn: {
     background: "#dc3545",
     color: "#fff",
@@ -340,5 +587,32 @@ const styles = {
     padding: "8px 12px",
     borderRadius: "5px",
     cursor: "pointer"
+  },
+  
+  errorInput: {
+    border: "1px solid #dc3545"
+  },
+  
+  errorText: {
+    color: "#dc3545",
+    fontSize: "12px",
+    marginTop: "4px"
+  },
+  
+  table: {
+    borderCollapse: "collapse",
+    width: "100%",
+    border: "1px solid #ddd"
+  },
+  
+  tableHeader: {
+    backgroundColor: "#f8f9fa",
+    borderBottom: "2px solid #ddd"
+  },
+  
+  noData: {
+    padding: "40px",
+    color: "#999",
+    fontSize: "14px"
   }
 };
