@@ -74,6 +74,10 @@ export default function Sidebar() {
             <FaBell /> Notifications
           </NavLink>
         )}
+        <NavLink to="/profile" className="nav-link">
+          <FaUser /> My Profile
+        </NavLink>
+
       </nav>
 
       {/* 🔥 LOGOUT BUTTON (BOTTOM) */}
