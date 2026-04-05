@@ -255,7 +255,7 @@ export default function Login() {
               style={styles.eyeIcon}
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {/* {showPassword ? <FaEyeSlash /> : <FaEye />} */}
             </span>
           </div>
           {submitted && errors.password && (
@@ -348,7 +348,7 @@ export default function Login() {
                   style={styles.eyeIcon} 
                   onClick={() => setShowRegPassword(!showRegPassword)}
                 >
-                  {showRegPassword ? <FaEyeSlash /> : <FaEye />}
+                  {/* {showRegPassword ? <FaEyeSlash /> : <FaEye />} */}
                 </span>
               </div>
               {regSubmitted && regErrors.password && (
@@ -369,7 +369,7 @@ export default function Login() {
                   style={styles.eyeIcon} 
                   onClick={() => setShowRegConfirmPassword(!showRegConfirmPassword)}
                 >
-                  {showRegConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                  {/* {showRegConfirmPassword ? <FaEyeSlash /> : <FaEye />} */}
                 </span>
               </div>
               {regSubmitted && regErrors.confirmPassword && (
