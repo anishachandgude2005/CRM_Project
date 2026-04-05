@@ -8,10 +8,6 @@ import {
   FaChartBar,
   FaBell,
   FaCog,
-<<<<<<< HEAD
-  FaUser,
-=======
->>>>>>> b7607d15ab922f31c3d06f93fa785cf2f39f4949
   FaSignOutAlt
 } from "react-icons/fa";
 
