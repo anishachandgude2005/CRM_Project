@@ -9,7 +9,6 @@ import {
   FaUser,
   FaBell,
   FaCog,
-  FaUser,
   FaSignOutAlt
 } from "react-icons/fa";
 
