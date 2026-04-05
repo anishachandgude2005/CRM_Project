@@ -21,9 +21,6 @@ const Leads = () => {
     phone: "",
     company: "",   // ✅ ADDED
     assignedTo: "",
-<<<<<<< HEAD
-    status: "New"
-=======
     status: "New",
     createdBy: "Admin"
   });
@@ -35,7 +32,6 @@ const Leads = () => {
     company: "",
     createdBy: "",
     assignedTo: ""
->>>>>>> b7607d15ab922f31c3d06f93fa785cf2f39f4949
   });
 
   const handleChange = (e) => {
@@ -198,8 +194,6 @@ const Leads = () => {
         });
       }, 100);
 
-<<<<<<< HEAD
-=======
       if (form.status === "Qualified") {
         dispatch({
           type: "ADD_TASK",
@@ -216,7 +210,6 @@ const Leads = () => {
         });
       }
 
->>>>>>> b7607d15ab922f31c3d06f93fa785cf2f39f4949
       setEditId(null);
 
     } else {
@@ -244,8 +237,6 @@ const Leads = () => {
           }
         });
       }, 100);
-<<<<<<< HEAD
-=======
 
       if (newLead.status === "Qualified") {
         dispatch({
@@ -262,7 +253,6 @@ const Leads = () => {
           }
         });
       }
->>>>>>> b7607d15ab922f31c3d06f93fa785cf2f39f4949
     }
 
     setForm({
@@ -277,19 +267,6 @@ const Leads = () => {
     setShowForm(false);
   };
 
-<<<<<<< HEAD
-  // 👁 VIEW
-  const viewLead = (lead) => {
-    alert(
-      `Lead Details\n\n` +
-      `Name: ${lead.name}\n` +
-      `Email: ${lead.email}\n` +
-      `Phone: ${lead.phone}\n` +
-      `Company: ${lead.company || "-"}\n` +
-      `Employee: ${lead.assignedTo || "Not Assigned"}\n` +
-      `Status: ${lead.status}`
-    );
-=======
   // DELETE
   const deleteLead = (id, leadName) => {
     Swal.fire({
@@ -327,7 +304,6 @@ const Leads = () => {
         }, 100);
       }
     });
->>>>>>> b7607d15ab922f31c3d06f93fa785cf2f39f4949
   };
 
   // CONVERT
@@ -416,22 +392,6 @@ const Leads = () => {
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h3>{editId ? "Update Lead" : "Add New Lead"}</h3>
 
-<<<<<<< HEAD
-            <input name="name" placeholder="Lead Name" value={form.name} onChange={handleChange} />
-            <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
-            <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
-            
-            <input name="company" placeholder="Company" value={form.company} onChange={handleChange} /> {/* ✅ ADDED */}
-
-            <select name="assignedTo" value={form.assignedTo} onChange={handleChange}>
-              <option value="">Assign Employee</option>
-              {employees.map((emp) => (
-                <option key={emp.id} value={emp.name}>
-                  {emp.name}
-                </option>
-              ))}
-            </select>
-=======
             {/* Created By Field */}
             <div>
               <input 
@@ -454,7 +414,6 @@ const Leads = () => {
               </select>
               {errors.assignedTo && <div style={styles.errorText}>{errors.assignedTo}</div>}
             </div>
->>>>>>> b7607d15ab922f31c3d06f93fa785cf2f39f4949
 
             {/* Status Field */}
             <select name="status" value={form.status} onChange={handleChange}>
@@ -464,8 +423,6 @@ const Leads = () => {
               <option>Lost</option>
             </select>
 
-<<<<<<< HEAD
-=======
             {/* Name Field */}
             <div>
               <input 
@@ -514,7 +471,6 @@ const Leads = () => {
               {errors.company && <div style={styles.errorText}>{errors.company}</div>}
             </div>
 
->>>>>>> b7607d15ab922f31c3d06f93fa785cf2f39f4949
             <div style={{ marginTop: "15px" }}>
               <button style={styles.saveBtn} onClick={saveLead}>Save</button>
 
@@ -540,58 +496,6 @@ const Leads = () => {
         </div>
       )}
 
-<<<<<<< HEAD
-      {/* TABLE */}
-      <table border="1" width="100%" cellPadding="10">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Company</th> {/* ✅ ADDED */}
-            <th>Assigned To</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {leads.length === 0 ? (
-            <tr>
-              <td colSpan="7" align="center">No Leads</td>
-            </tr>
-          ) : (
-            leads.map((lead) => (
-              <tr key={lead.id}>
-                <td>{lead.name}</td>
-                <td>{lead.email}</td>
-                <td>{lead.phone}</td>
-                <td>{lead.company || "-"}</td> {/* ✅ ADDED */}
-                <td>{lead.assignedTo || "-"}</td>
-                <td>{lead.status}</td>
-
-                <td>
-                  <button style={styles.viewBtn} onClick={() => viewLead(lead)}>
-                    <FaEye /> View
-                  </button>
-
-                  <button style={styles.editBtn} onClick={() => editLead(lead)}>
-                    <FaEdit /> Edit
-                  </button>
-
-                  {lead.status === "Qualified" && (
-                    <button
-                      style={styles.convertBtn}
-                      onClick={() => convertToCustomer(lead)}
-                    >
-                      <FaExchangeAlt /> Convert
-                    </button>
-                  )}
-
-                  <button style={styles.deleteBtn} onClick={() => deleteLead(lead.id)}>
-                    <FaTrash /> Delete
-                  </button>
-=======
       {/* FIRST TABLE - Shows ALL leads with Actions */}
       <div style={styles.tableContainer}>
         <table border="1" width="100%" cellPadding="10" style={styles.table}>
@@ -612,7 +516,6 @@ const Leads = () => {
               <tr>
                 <td colSpan="8" align="center" style={styles.noData}>
                   No leads available. Click 'Add Lead' to create one.
->>>>>>> b7607d15ab922f31c3d06f93fa785cf2f39f4949
                 </td>
               </tr>
             ) : (
