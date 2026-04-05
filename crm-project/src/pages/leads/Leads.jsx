@@ -19,7 +19,7 @@ const Leads = () => {
     name: "",
     email: "",
     phone: "",
-    company: "",
+    company: "",   // ✅ ADDED
     assignedTo: "",
     status: "New",
     createdBy: "Admin"
@@ -213,7 +213,7 @@ const Leads = () => {
       setEditId(null);
 
     } else {
-      const newLead = { ...form, id: Date.now(), createdBy: form.createdBy || "Admin" };
+      const newLead = { ...form, id: Date.now() };
 
       dispatch({
         type: "ADD_LEAD",
@@ -259,10 +259,9 @@ const Leads = () => {
       name: "",
       email: "",
       phone: "",
-      company: "",
+      company: "",   // ✅ RESET
       assignedTo: "",
-      status: "New",
-      createdBy: "Admin"
+      status: "New"
     });
 
     setShowForm(false);
@@ -474,6 +473,7 @@ const Leads = () => {
 
             <div style={{ marginTop: "15px" }}>
               <button style={styles.saveBtn} onClick={saveLead}>Save</button>
+
               <button
                 style={styles.cancelBtn}
                 onClick={() => {
@@ -485,8 +485,7 @@ const Leads = () => {
                     phone: "",
                     company: "",
                     assignedTo: "",
-                    status: "New",
-                    createdBy: "Admin"
+                    status: "New"
                   });
                 }}
               >
