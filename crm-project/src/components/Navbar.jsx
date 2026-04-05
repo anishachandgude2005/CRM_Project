@@ -2,13 +2,18 @@ import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
-import { FaBell, FaUser } from "react-icons/fa";
+import { FaBell } from "react-icons/fa";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const { state } = useContext(AppContext);
 
   const user = JSON.parse(localStorage.getItem("crmUser"));
+
+  const handleLogout = () => {
+    localStorage.removeItem("crmUser");
+    navigate("/");
+  };
 
   return (
     <nav className="navbar shadow-sm px-4 d-flex align-items-center">
@@ -21,13 +26,14 @@ export default function Navbar() {
       {/* RIGHT */}
       <div className="ms-auto d-flex align-items-center gap-4">
 
-        {/* 🔔 Notification */}
+        {/* 🔔 Notification Icon */}
         <div
           style={{ position: "relative", cursor: "pointer" }}
           onClick={() => navigate("/notification")}
         >
           <FaBell size={20} />
 
+          {/* Badge */}
           {state.notifications.length > 0 && (
             <span style={styles.badge}>
               {state.notifications.length}
@@ -35,7 +41,7 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* 👤 USER INFO */}
+        {/* 👤 User Info */}
         <div className="text-end">
           <div className="fw-semibold">
             {user?.name || "User"}
@@ -45,13 +51,12 @@ export default function Navbar() {
           </small>
         </div>
 
-        {/* ✅ MY PROFILE BUTTON */}
+        {/* 🚪 Logout */}
         <button
-          style={styles.profileBtn}
-          onClick={() => navigate("/profile")}
+          className="btn btn-danger px-3"
+          onClick={handleLogout}
         >
-          <FaUser style={{ marginRight: "6px" }} />
-          
+          Logout
         </button>
       </div>
     </nav>
@@ -68,17 +73,5 @@ const styles = {
     borderRadius: "50%",
     padding: "2px 6px",
     fontSize: "12px"
-  },
-
-  profileBtn: {
-    background: "linear-gradient(135deg,#36d1dc,#5b86e5)",
-    color: "#fff",
-    border: "none",
-    padding: "8px 14px",
-    borderRadius: "10px",
-    cursor: "pointer",
-    fontWeight: "600",
-    display: "flex",
-    alignItems: "center"
   }
 };

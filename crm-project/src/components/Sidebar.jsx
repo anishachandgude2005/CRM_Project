@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 import {
   FaTachometerAlt,
@@ -6,6 +6,7 @@ import {
   FaUsers,
   FaTasks,
   FaChartBar,
+  FaUser,
   FaBell,
   FaCog,
   FaSignOutAlt,
@@ -14,20 +15,12 @@ import {
 
 export default function Sidebar() {
   const user = JSON.parse(localStorage.getItem("crmUser"));
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("crmUser");
-    navigate("/");
-  };
 
   return (
-    <aside className="sidebar d-flex flex-column" style={{ height: "100vh" }}>
-      
-      <h3 className="logo text-center py-3">CRM System</h3>
+    <aside className="sidebar">
+      <h3 className="logo">CRM System</h3>
 
-      {/* MENU */}
-      <nav className="nav flex-column px-3">
+      <nav>
 
         <NavLink to="/dashboard" className="nav-link">
           <FaTachometerAlt /> Dashboard
@@ -53,11 +46,12 @@ export default function Sidebar() {
           </NavLink>
         )}
 
-        {/* All */}
+        {/* All Roles */}
         <NavLink to="/tasks" className="nav-link">
           <FaTasks /> Tasks
         </NavLink>
 
+        {/* Admin + Manager */}
         {(user?.role === "Admin" || user?.role === "Manager") && (
           <NavLink to="/reports" className="nav-link">
             <FaChartBar /> Reports
@@ -70,27 +64,11 @@ export default function Sidebar() {
           </NavLink>
         )}
 
-        {(user?.role === "Admin" || user?.role === "Manager") && (
-          <NavLink to="/notification" className="nav-link">
-            <FaBell /> Notifications
-          </NavLink>
-        )}
         <NavLink to="/profile" className="nav-link">
           <FaUser /> My Profile
         </NavLink>
 
       </nav>
-
-      {/* 🔥 LOGOUT BUTTON (BOTTOM) */}
-      <div className="mt-auto text-center pb-3">
-        <button
-          className="btn btn-danger px-3 d-flex align-items-center justify-content-center gap-2 mx-3"
-          onClick={handleLogout}
-        >
-          <FaSignOutAlt />
-          Logout
-        </button>
-      </div>
     </aside>
   );
 }
